@@ -1,0 +1,254 @@
+/*
+ * Author       : funaiindia
+ * Generated on : 25-Jul-2026
+ * Version      : 1.0
+ * 用途         : Email / Phone / Lookup（単一選択）の検証済み構文リファレンス
+ *                （T1_押印申請.ds・T2_稟議申請.ds に実例が無いフィールド型のみを補足する）
+ */
+application "フィールド型リファレンス"
+{
+	date format = "dd-MMM-yyyy"
+	time zone = "Asia/Tokyo"
+	time format = "24-hr"
+
+	forms
+	{
+		form department_master
+		{
+			displayname = "部署マスタ"
+			success message = "データが正常に追加されました！"
+			Section
+			(
+				type = section
+				row = 1
+				column = 0
+				width = medium
+			)
+			must have unique department_name
+			(
+				type = text
+				displayname = "部署名"
+				row = 1
+				column = 1
+				width = medium
+			)
+
+			actions
+			{
+				on add
+				{
+					submit
+					(
+						type = submit
+						displayname = "提出"
+					)
+					reset
+					(
+						type = reset
+						displayname = "リセット"
+					)
+				}
+				on edit
+				{
+					update
+					(
+						type = submit
+						displayname = "更新"
+					)
+					cancel
+					(
+						type = cancel
+						displayname = "キャンセル"
+					)
+				}
+			}
+		}
+		form contact_sample
+		{
+			displayname = "連絡先サンプル"
+			success message = "データが正常に追加されました！"
+			Section
+			(
+				type = section
+				row = 1
+				column = 0
+				width = medium
+			)
+			must have unique contact_email
+			(
+				type = email
+				displayname = "メールアドレス"
+				row = 1
+				column = 1
+				width = medium
+			)
+			must have contact_phone
+			(
+				type = phonenumber
+				displayname = "電話番号"
+				row = 1
+				column = 1
+				width = medium
+			)
+			must have department
+			(
+				type = picklist
+				displayname = "所属部署"
+				values = department_master.ID
+				displayformat = [department_name]
+				sortorder = ascending
+				row = 1
+				column = 1
+				width = medium
+			)
+			related_departments
+			(
+				type = list
+				displayname = "関連部署（複数選択の場合）"
+				values = department_master.ID
+				displayformat = [department_name]
+				sortorder = ascending
+				height = 60px
+				row = 1
+				column = 1
+				width = medium
+			)
+
+			actions
+			{
+				on add
+				{
+					submit
+					(
+						type = submit
+						displayname = "提出"
+					)
+					reset
+					(
+						type = reset
+						displayname = "リセット"
+					)
+				}
+				on edit
+				{
+					update
+					(
+						type = submit
+						displayname = "更新"
+					)
+					cancel
+					(
+						type = cancel
+						displayname = "キャンセル"
+					)
+				}
+			}
+		}
+	}
+
+	web
+	{
+		forms
+		{
+			form department_master
+			{
+				label placement = left
+			}
+			form contact_sample
+			{
+				label placement = left
+			}
+		}
+		menu
+		{
+			space Space
+			{
+				displayname = "Space"
+				icon = "objects-spaceship"
+
+				section Section_1
+				{
+					displayname = "部署マスタ"
+					icon = "business-laptop-71"
+					form department_master
+					{
+						icon = "ui-1-bold-add"
+					}
+				}
+				section Section_2
+				{
+					displayname = "連絡先サンプル"
+					icon = "business-laptop-71"
+					form contact_sample
+					{
+						icon = "ui-1-bold-add"
+					}
+				}
+				section ZC_App_Preferences
+				{
+					displayname = "App Preferences"
+					icon = "design-app"
+					systemcomponent
+					{
+						type = localization
+						displayname = "Language Selection"
+						icon = "education-language"
+					}
+					systemcomponent
+					{
+						type = connection
+						displayname = "Integrations"
+						icon = "tech-2-connection"
+					}
+				}
+				section ZC_Approvals
+				{
+					displayname = "Approvals"
+					icon = "ui-2-hourglass"
+					systemcomponent
+					{
+						type = approval
+						approval status = pending
+						displayname = "Pending Tasks"
+						icon = "ui-2-hourglass"
+					}
+					systemcomponent
+					{
+						type = approval
+						approval status = completed
+						displayname = "Completed Tasks"
+						icon = "design-todo"
+					}
+				}
+				section SharedAnalytics_Section
+				{
+					type = shared_user_report_section
+					displayname = "Reports"
+					icon = "business-chart-bar-33"
+				}
+			}
+			preference
+			{
+				icon
+				{
+					style = solid
+					show = {space,section,component}
+				}
+			}
+		}
+		customize
+		{
+			new theme = 4
+			font = "lato"
+			color options
+			{
+				color = "1"
+			}
+			logo
+			{
+				preference = "none"
+				placement = "left"
+			}
+		}
+	}
+}
