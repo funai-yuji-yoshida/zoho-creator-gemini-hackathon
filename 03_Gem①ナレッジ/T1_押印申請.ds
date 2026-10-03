@@ -1,0 +1,703 @@
+/*
+ * Author       : funaiindia
+ * Generated on : 28-Apr-2026 00:42:53
+ * Version      : 1.0
+ */
+ application "押印申請アプリ"
+ {
+ 	date format = "dd-MMM-yyyy"
+ 	time zone = "America/Los_Angeles"
+ 	time format = "24-hr"
+
+ 	forms
+	{
+		form stamp_requests
+		{
+			displayname = "押印申請"
+			success message = "データが正常に追加されました！"
+			Section
+			(
+				type = section
+	 			row = 1
+	 			column = 0   
+				width = medium
+			)
+			must have applicant
+			(
+    			type = picklist
+				displayname = "申請者"
+				module = users
+				displayformat = [username]
+	 			row = 1
+	 			column = 1   
+				width = medium
+				personal data = true
+			)
+			must have stamp_type
+			(
+				type = picklist
+				displayname = "押印種別"
+				values = {"代表印","社印","その他","角印"}
+				others option = true
+	 			row = 1
+	 			column = 1   
+				width = medium
+			)
+			target_document
+			(
+    			type = text
+				displayname = "押印対象書類"
+	 			row = 1
+	 			column = 1   
+				width = medium
+			)
+			must have desired_date
+			(
+    			type = date
+				displayname = "押印希望日"
+				alloweddays = 0,1,2,3,4,5,6
+	 			row = 1
+	 			column = 1   
+				width = medium
+			)
+			must have reason
+			(
+    			type = textarea
+				displayname = "申請理由"
+				height = 100px
+	 			row = 1
+	 			column = 1   
+				width = medium
+			)
+			attachment
+			(
+    			type = upload file
+				displayname = "添付ファイル"
+    			file count = 10
+				browse = local_drive
+	 			row = 1
+	 			column = 1   
+				width = medium
+			)
+			remarks
+			(
+    			type = textarea
+				displayname = "備考"
+				height = 100px
+	 			row = 1
+	 			column = 1   
+				width = medium
+			)
+			status
+			(
+				type = picklist
+				displayname = "ステータス"
+				values = {"申請中","承認待ち","差し戻し","承認済み"}
+				others option = true
+	 			row = 1
+	 			column = 1   
+				width = medium
+			)
+			must have application_date
+			(
+    			type = date
+				displayname = "申請日"
+				initial value = "${zoho.currentdate}"
+				alloweddays = 0,1,2,3,4,5,6
+	 			row = 1
+	 			column = 2   
+				width = medium
+			)
+			stamp_copies
+			(
+				type = number
+				displayname = "押印部数"
+				maxchar = 19
+				initial value = 1
+	 			row = 1
+	 			column = 2   
+				width = medium
+			)
+			Section2
+			(
+				type = section
+				displayname = "承認セクション"
+				visibility = true
+	 			row = 2
+	 			column = 0   
+				width = medium
+			)
+			approval_result
+			(
+				type = picklist
+				displayname = "承認結果"
+				maxchar = 100
+				values = {"承認","差し戻し","その他"}
+	 			row = 2
+	 			column = 1   
+				width = medium
+			)
+			approval_comment
+			(
+    			type = textarea
+				displayname = "承認コメント"
+				height = 100px
+	 			row = 2
+	 			column = 1   
+				width = medium
+			)
+			approver_name
+			(
+    			type = picklist
+				displayname = "承認者"
+				module = users
+				displayformat = [username]
+	 			row = 2
+	 			column = 1   
+				width = medium
+				personal data = true
+			)
+			approved_at
+			(
+    			type = datetime
+				displayname = "承認日時"
+				timedisplayoptions = "hh:mm:ss"
+				alloweddays = 0,1,2,3,4,5,6
+	 			row = 2
+	 			column = 1   
+				width = medium
+			)
+	
+			actions
+			{
+				on add
+				{
+					submit
+					(
+   						type = submit
+   						displayname = "提出"
+					)
+					reset
+					(
+   						type = reset
+   						displayname = "リセット"
+					)
+				}
+				on edit
+				{
+					update
+					(
+   						type = submit
+   						displayname = "更新"
+					)
+					cancel
+					(
+   						type = cancel
+   						displayname = "キャンセル"
+					)
+				}
+			}
+			blueprint components
+			{
+				stages = {"押印申請作成","承認待ち","申請取消","承認済み","却下","押印実施","承認取消","申請再提出","押印完了","押印延期","完了"}
+			}
+		}
+	}
+	reports
+	{
+		list stamp_requests_Report
+		{
+			displayName = "押印申請レポート"
+			show all rows from stamp_requests    
+			(
+				application_date as "申請日"
+				stamp_type as "押印種別"
+				target_document as "押印対象書類"
+				stamp_copies as "押印部数"
+				desired_date as "押印希望日"
+				reason as "申請理由"
+				status as "ステータス"
+				remarks as "備考"
+				approval_comment as "承認コメント"
+				approved_at as "承認日時"
+			)
+			conditional formatting
+			(
+				"New Formatting1"
+				{
+				condition = (stamp_type == "その他")
+				fields = [stamp_type]
+				format = "color:#ffffff;background-color:#765f89;"
+				}
+				"New Formatting2"
+				{
+				condition = (stamp_type == "代表印")
+				fields = [stamp_type]
+				format = "color:#000000;background-color:#1bbc9b;"
+				}
+				"New Formatting3"
+				{
+				condition = (stamp_type == "角印")
+				fields = [stamp_type]
+				format = "color:#ffffff;background-color:#e84c3d;"
+				}
+			)
+		}
+	}
+
+
+
+
+		workflow
+		{
+		form
+		{
+			W_ as "編集ロック"
+			{
+				type =  form
+				form = stamp_requests
+
+				record event = on add or edit
+
+				on load
+				{
+					actions 
+					{
+						custom deluge script
+						(
+											if(input.status == "承認済み")
+										{
+											disable applicant;
+											disable application_date;
+											disable stamp_type;
+											disable target_document;
+											disable stamp_copies;
+											disable desired_date;
+											disable reason;
+											disable attachment;
+											disable remarks;
+											disable approval_result;
+											disable approval_comment;
+										}
+						)
+					}
+				}
+
+			}
+		}
+
+
+
+
+		blueprint
+		{
+    			stamp_request_approval_process as "押印申請承認プロセス"
+    			{
+        			type = Blueprint
+        			form = stamp_requests
+        			start
+        			{
+        			}
+        			stages
+        			{
+           			"押印申請作成"
+           			{
+           			}
+           			"承認待ち"
+           			{
+           			}
+           			"申請取消"
+           			{
+           			}
+           			"承認済み"
+           			{
+           			}
+           			"却下"
+           			{
+           			}
+           			"押印実施"
+           			{
+           			}
+           			"承認取消"
+           			{
+           			}
+           			"申請再提出"
+           			{
+           			}
+           			"押印完了"
+           			{
+           			}
+           			"押印延期"
+           			{
+           			}
+           			"完了"
+           			{
+           			}
+        			}
+        			transitions
+        			{
+        			}
+    			}
+		}
+
+
+	}
+	share_settings
+	{
+			"Developer"
+			{
+				name = "Developer"
+				type = Developer
+				permissions = {Chat:false, Predefined:true, ApiAccess:true, PIIAccess:true, ePHIAccess:true}
+				description = "Developer Profile\n"
+			}
+			"Administrator"
+			{
+				name = "Administrator"
+				type = Users_Permissions
+				permissions = {Chat:true, Predefined:true, ApiAccess:true, PIIAccess:true, ePHIAccess:true}
+				description = "This profile will have all the permissions.\n"
+			}
+			"申請者"
+			{
+				name = "申請者"
+				type = Users_Permissions
+				permissions = {Chat:false, Predefined:false, ApiAccess:true, PIIAccess:true, ePHIAccess:true}
+				description = "押印申請フォームを提出し、申請内容を記入する \n"
+				ModulePermissions
+				{
+					stamp_requests
+					{
+						enabled= Create,Tab 
+						allFieldsVisible= true 
+						ReportPermissions
+						{
+							stamp_requests_Report={"View","Edit"}
+						}
+					}
+				}
+			}
+			"承認者"
+			{
+				name = "承認者"
+				type = Users_Permissions
+				permissions = {Chat:false, Predefined:false, ApiAccess:true, PIIAccess:true, ePHIAccess:true}
+				description = "承認待ちの押印申請を確認し、承認または差し戻しを行う \n"
+				ModulePermissions
+				{
+					stamp_requests
+					{
+						enabled= Viewall,Modifyall 
+						allFieldsVisible= true 
+						ReportPermissions
+						{
+							stamp_requests_Report={"View","Edit","Delete"}
+						}
+					}
+				}
+			}
+			"管理者"
+			{
+				name = "管理者"
+				type = Users_Permissions
+				permissions = {Chat:false, Predefined:false, ApiAccess:true, PIIAccess:true, ePHIAccess:true}
+				description = "全申請データの閲覧と管理を行う \n"
+				ModulePermissions
+				{
+					stamp_requests
+					{
+						enabled= Create,Viewall,Modifyall,Import,Export,Tab 
+						allFieldsVisible= true 
+						ReportPermissions
+						{
+							stamp_requests_Report={"View","Edit","Delete"}
+						}
+					}
+				}
+			}
+			"Customer"
+			{
+				name = "Customer"
+				type = Customer_Portal
+				permissions = {Chat:false, Predefined:true, ApiAccess:true, PIIAccess:true, ePHIAccess:true}
+				description = "This is the default profile having only add and view permission.\n"
+			}
+			"外部依頼者"
+			{
+				name = "外部依頼者"
+				type = Customer_Portal
+				permissions = {Chat:false, Predefined:false, ApiAccess:true, PIIAccess:true, ePHIAccess:true}
+				description = "自社の書類押印を依頼する外部機関や個人 \n"
+				ModulePermissions
+				{
+					stamp_requests
+					{
+						enabled= Viewall 
+						allFieldsVisible= true 
+						ReportPermissions
+						{
+							stamp_requests_Report={"View"}
+						}
+					}
+				}
+			}
+			roles
+			{
+				"CEO"
+				{
+					description = "User belonging to this role can access data of all other users."
+				}
+			}
+	}
+
+
+	web
+	{
+		forms
+		{
+			form stamp_requests
+			{
+				label placement = left
+			}
+		}
+		reports
+		{
+			report stamp_requests_Report
+			{
+				quickview
+				(
+					layout
+					(
+		 				type = -1
+						datablock1
+						(
+							layout type = -1
+							fields
+							(
+								application_date as "申請日"
+								stamp_type as "押印種別"
+								target_document as "押印対象書類"
+								stamp_copies as "押印部数"
+								desired_date as "押印希望日"
+								reason as "申請理由"
+								status as "ステータス"
+								remarks as "備考"
+								approval_comment as "承認コメント"
+								approved_at as "承認日時"
+							)
+						)
+					)
+					menu
+    				(
+    	 				header
+    	 				(
+    		 				Edit  as "編集" 
+    		 				Duplicate  as "複製" 
+    		 				Delete  as "削除" 
+    		 				Print  as "印刷" 
+    		 				Add 
+    		 				Import 
+    		 				Export 
+    	 				)
+						record
+						(
+							Edit  as "編集"   	   
+							Duplicate  as "複製"   	   
+							Delete  as "削除"   	   
+							Print  as "印刷"   	   
+    					)
+    				)
+    				action
+    				(
+						on click
+						(
+							View Record  as "レコード表示"   	   
+    					)
+						on right click
+						(
+							Edit  as "編集"   	   
+							Duplicate  as "複製"   	   
+							Delete  as "削除"   	   
+							Print  as "印刷"   	   
+							View Record  as "レコード表示"   	   
+    					)
+     				)
+				)
+
+				detailview
+				(
+					layout
+					(
+		 				type = 1
+						datablock1
+						(
+							layout type = -2
+		     				title = "概要"
+							fields
+							(
+								application_date as "申請日"
+								stamp_type as "押印種別"
+								target_document as "押印対象書類"
+								stamp_copies as "押印部数"
+								desired_date as "押印希望日"
+								reason as "申請理由"
+								status as "ステータス"
+								remarks as "備考"
+								approval_comment as "承認コメント"
+								approved_at as "承認日時"
+							)
+						)
+					)
+					menu
+    				(
+    	 				header
+    	 				(
+    		 				Edit  as "編集" 
+    		 				Duplicate  as "複製" 
+    		 				Delete  as "削除" 
+    		 				Print  as "印刷" 
+    	 				)
+    				)
+				)
+			}
+		}
+		menu
+		{
+			space Space
+			{
+				displayname = "Space"
+				icon = "objects-spaceship"
+
+				section Section_2
+				{
+					displayname = "押印申請"
+					icon = "business-laptop-71"
+					form  stamp_requests
+					{
+						icon = "ui-1-bold-add"
+					}
+					report stamp_requests_Report
+					{
+						icon = "business-laptop-71"
+					}
+				}
+				section ZC_App_Preferences
+				{
+					displayname = "App Preferences"
+					icon = "design-app"
+					systemcomponent
+					{
+						type = localization
+						displayname = "Language Selection"
+						icon = "education-language"
+					}
+					systemcomponent
+					{
+						type = connection
+						displayname = "Integrations"
+						icon = "tech-2-connection"
+					}
+				}
+				section ZC_Approvals
+				{
+					displayname = "Approvals"
+					icon = "ui-2-hourglass"
+					systemcomponent
+					{
+						type = approval
+						approval status = pending
+						displayname = "Pending Tasks"
+						icon = "ui-2-hourglass"
+					}
+					systemcomponent
+					{
+						type = approval
+						approval status = completed
+						displayname = "Completed Tasks"
+						icon = "design-todo"
+					}
+				}
+				section SharedAnalytics_Section
+				{
+					type = shared_user_report_section
+					displayname = "Reports"
+					icon = "business-chart-bar-33"
+				}
+			}
+			preference
+			{
+				icon
+				{
+					style = solid
+					show = {space,section,component}
+				}
+			}
+		}
+		customize
+		{
+			new theme = 4
+			font = "lato"
+			color options
+			{
+				color = "1"
+			}
+			logo
+			{
+				preference = "none"
+				placement = "left"
+			}
+		}
+	}
+	phone
+	{
+		forms
+		{
+			form stamp_requests
+			{
+				label placement = auto
+			}
+		}
+		customize
+		{
+			layout = slidingpane
+			font = "default"
+			style = "3"
+			color options
+			{
+				color = yellow
+			}
+			logo
+			{
+				preference = "company_logo"
+			}
+		}
+	}
+	tablet
+	{
+		forms
+		{
+			form stamp_requests
+			{
+				label placement = auto
+			}
+		}
+		customize
+		{
+			layout = slidingpane
+			font = "default"
+			style = "3"
+			color options
+			{
+				color = yellow
+			}
+			logo
+			{
+				preference = "company_logo"
+			}
+		}
+	}
+	translation
+{
+{"Language_Settings":{"LANGAGUE_WITH_LOGIN":"browser"}}
+}
+}
