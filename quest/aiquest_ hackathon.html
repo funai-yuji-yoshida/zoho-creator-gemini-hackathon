@@ -1,0 +1,1897 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>AI QUEST | あなたはAI時代の何者になる？</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+  <!-- Google Fonts: Cinzel & Noto Sans JP -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            quest: {
+              dark: '#080d1a',
+              card: '#0f172a',
+              panel: '#151e36',
+              accent: '#38bdf8',
+              gold: '#f59e0b',
+              goldLight: '#fde68a',
+              danger: '#f43f5e',
+              border: '#1e293b'
+            }
+          },
+          fontFamily: {
+            title: ['Cinzel', 'Noto Sans JP', 'serif'],
+            sans: ['Noto Sans JP', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    :root { box-sizing: border-box; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+    html { scroll-padding-top: env(safe-area-inset-top, 0px); background:#080d1a; }
+    header.sticky { top: env(safe-area-inset-top, 0px) !important; }
+    body {
+      background-color: #080d1a;
+      color: #e2e8f0;
+      font-family: 'Noto Sans JP', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(56, 189, 248, 0.08) 0%, transparent 60%),
+        radial-gradient(circle at 100% 100%, rgba(245, 158, 11, 0.05) 0%, transparent 40%);
+    }
+
+    /* Fantasy Frame styling */
+    .rpg-frame {
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      position: relative;
+    }
+    .rpg-frame::before {
+      content: "";
+      position: absolute;
+      top: -2px; left: -2px; width: 8px; height: 8px;
+      border-top: 2px solid #f59e0b;
+      border-left: 2px solid #f59e0b;
+    }
+    .rpg-frame::after {
+      content: "";
+      position: absolute;
+      bottom: -2px; right: -2px; width: 8px; height: 8px;
+      border-bottom: 2px solid #f59e0b;
+      border-right: 2px solid #f59e0b;
+    }
+
+    /* Glow utilities */
+    .glow-gold {
+      box-shadow: 0 0 25px -5px rgba(245, 158, 11, 0.25);
+    }
+    .glow-cyan {
+      box-shadow: 0 0 25px -5px rgba(56, 189, 248, 0.25);
+    }
+
+    /* Custom summoning animation */
+    @keyframes runeRotate {
+      0% { transform: rotate(0deg) scale(0.95); opacity: 0.7; }
+      50% { transform: rotate(180deg) scale(1.05); opacity: 1; }
+      100% { transform: rotate(360deg) scale(0.95); opacity: 0.7; }
+    }
+    .animate-rune {
+      animation: runeRotate 8s linear infinite;
+    }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #080d1a;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1e293b;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #f59e0b;
+    }
+
+    /* ===== GAME LAYER ===== */
+    .hud-bar { height: 8px; border-radius: 999px; background: #0b1222; overflow: hidden; border: 1px solid #1e293b; }
+    .hud-fill { height: 100%; transition: width .45s cubic-bezier(.2,.8,.2,1), background-color .3s; }
+    .hp-fill { background: linear-gradient(90deg,#f43f5e,#fb7185); }
+    .hp-fill.low { background: #f43f5e; animation: hpPulse .8s ease-in-out infinite; }
+    .exp-fill { background: linear-gradient(90deg,#38bdf8,#a78bfa); }
+    .enemy-fill { background: linear-gradient(90deg,#f59e0b,#f43f5e); }
+    @keyframes hpPulse { 50% { opacity: .45; } }
+
+    @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-7px) rotate(-3deg)} 40%{transform:translateX(6px) rotate(2deg)} 60%{transform:translateX(-4px)} 80%{transform:translateX(3px)} }
+    .fx-shake { animation: shake .45s ease-in-out; }
+    @keyframes defeat { 0%{transform:scale(1);opacity:1;filter:none} 40%{transform:scale(1.15);filter:brightness(2.2)} 100%{transform:scale(.4) rotate(25deg);opacity:0} }
+    .fx-defeat { animation: defeat .7s ease-in forwards; }
+    @keyframes screenHit { 0%,100%{box-shadow: inset 0 0 0 0 rgba(244,63,94,0)} 30%{box-shadow: inset 0 0 0 4px rgba(244,63,94,.75)} }
+    .fx-hit { animation: screenHit .5s ease-out; }
+
+    .dmg-pop { position:absolute; left:50%; top:-6px; transform:translateX(-50%); font-family:'Cinzel',serif; font-weight:800; font-size:1.6rem; pointer-events:none; white-space:nowrap; animation: dmgFloat 1s ease-out forwards; text-shadow:0 2px 0 #000; }
+    @keyframes dmgFloat { 0%{opacity:0; transform:translate(-50%,8px) scale(.6)} 20%{opacity:1; transform:translate(-50%,-6px) scale(1.25)} 100%{opacity:0; transform:translate(-50%,-44px) scale(1)} }
+
+    .battle-overlay { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; background: rgba(8,13,26,.72); backdrop-filter: blur(2px); border-radius: 1rem; z-index: 20; }
+    .battle-overlay .verdict { animation: verdictIn .35s cubic-bezier(.2,1.4,.4,1) both; }
+    @keyframes verdictIn { from { transform: scale(.5); opacity:0 } to { transform: scale(1); opacity:1 } }
+
+    .combo-badge { transition: transform .2s; }
+    .combo-badge.bump { transform: scale(1.35); }
+
+    .timer-ring circle.track { stroke: #1e293b; }
+    .timer-ring circle.bar { stroke: #38bdf8; transition: stroke-dashoffset .1s linear, stroke .3s; }
+    .timer-ring.warn circle.bar { stroke: #f43f5e; }
+
+    .levelup-toast { position: fixed; left: 50%; top: 84px; transform: translateX(-50%); z-index: 60; animation: lvIn 1.6s ease-out forwards; pointer-events:none; }
+    @keyframes lvIn { 0%{opacity:0; transform:translate(-50%,-12px) scale(.8)} 15%{opacity:1; transform:translate(-50%,0) scale(1.08)} 80%{opacity:1} 100%{opacity:0; transform:translate(-50%,-10px)} }
+
+    .opt-locked { pointer-events: none; opacity: .55; }
+    .opt-picked { opacity: 1 !important; border-color: #f59e0b !important; background: rgba(245,158,11,.12) !important; }
+
+    button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible { outline: 2px solid #fde68a; outline-offset: 2px; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .fx-shake, .fx-defeat, .fx-hit, .dmg-pop, .levelup-toast, .battle-overlay .verdict, .hp-fill.low { animation: none !important; }
+      .hud-fill { transition: none; }
+    }
+  </style>
+</head>
+
+<body class="flex flex-col min-h-screen">
+  <header class="w-full border-b border-slate-800/80 bg-slate-950/80 backdrop-blur sticky top-0 z-40">
+    <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <span class="text-amber-400 text-xl font-bold tracking-wider font-title">⚔️ AI QUEST</span>
+        <span class="hidden sm:inline-block text-xs uppercase px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700">Business RPG Ver 1.0</span>
+      </div>
+      <div id="header-user-badge" class="hidden text-xs text-slate-300 items-center gap-2 bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-full">
+        <i class="fa-solid fa-user-shield text-amber-400"></i>
+        <span id="header-username" class="font-medium truncate max-w-[120px]">勇者</span>
+      </div>
+    </div>
+    <!-- Quest Progress Bar (Hidden during START & PROFILE) -->
+    <div id="progress-container" class="hidden w-full bg-slate-900 h-1.5 overflow-hidden">
+      <div id="progress-bar" class="bg-gradient-to-r from-sky-500 via-amber-400 to-amber-300 h-full w-0 transition-all duration-300 ease-out"></div>
+    </div>
+  </header>
+
+  <main class="flex-grow flex items-center justify-center p-4 sm:p-6 md:p-8">
+    <div class="w-full max-w-3xl">
+
+      <!-- ================= SCREEN 1: START ================= -->
+      <section id="screen-start" class="block text-center space-y-8 py-6">
+        <div class="space-y-4">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-semibold tracking-wider uppercase mb-2">
+            <i class="fa-solid fa-sparkles"></i> AI Competency Diagnostic
+          </div>
+          <h1 class="text-4xl sm:text-6xl font-black font-title tracking-tight text-white drop-shadow-md">
+            ⚔️ AI QUEST
+          </h1>
+          <p class="text-xl sm:text-2xl font-bold text-sky-400 tracking-wide">
+            「あなたはAI時代の何者になる？」
+          </p>
+        </div>
+
+        <div class="bg-slate-900/90 border border-slate-800 p-6 sm:p-8 rounded-2xl shadow-2xl relative rpg-frame glow-cyan max-w-xl mx-auto">
+          <p class="text-slate-300 text-sm sm:text-base leading-relaxed text-left sm:text-center">
+            10〜15問のクエストに答えてください。<br class="hidden sm:inline">
+            AIの知識だけでなく、<span class="text-amber-400 font-bold">AIを使って仕事を変える力</span>を診断します。
+          </p>
+          <div class="grid grid-cols-3 gap-2 mt-6 pt-6 border-t border-slate-800/80 text-xs text-slate-400">
+            <div><i class="fa-solid fa-shield-halved text-sky-400 mb-1 block text-base"></i>6能力値診断</div>
+            <div><i class="fa-solid fa-id-card-clip text-amber-400 mb-1 block text-base"></i>12クラス判定</div>
+            <div><i class="fa-solid fa-compass text-emerald-400 mb-1 block text-base"></i>NEXT QUEST策定</div>
+          </div>
+          <p class="mt-5 text-xs text-slate-400 leading-relaxed">
+            <i class="fa-solid fa-hourglass-half text-sky-400 mr-1"></i>各問に制限時間あり。モンスターを倒すとEXP獲得、連続撃破でコンボボーナス。最後はボス戦です。
+          </p>
+        </div>
+
+        <div class="pt-2">
+          <button id="btn-start" onclick="App.goToProfile()" class="group relative inline-flex items-center justify-center px-10 py-4 font-bold text-slate-950 transition-all duration-200 bg-amber-400 rounded-xl hover:bg-amber-300 hover:shadow-lg hover:shadow-amber-500/30 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-400">
+            <span class="text-lg tracking-wider">冒険を始める</span>
+            <i class="fa-solid fa-chevron-right ml-3 transition-transform group-hover:translate-x-1"></i>
+          </button>
+        </div>
+      </section>
+
+      <!-- ================= SCREEN 2: PROFILE ================= -->
+      <section id="screen-profile" class="hidden space-y-6">
+        <div class="text-center space-y-2">
+          <span class="text-amber-400 text-xs font-bold tracking-widest uppercase">Adventurer Registration</span>
+          <h2 class="text-2xl sm:text-3xl font-bold text-white">冒険者プロフィールの登録</h2>
+          <p class="text-slate-400 text-xs sm:text-sm">あなたの現在のギルド（組織）での立ち位置を教えてください。</p>
+        </div>
+
+        <div class="bg-slate-900/95 border border-slate-800 p-6 sm:p-8 rounded-2xl shadow-xl rpg-frame space-y-6">
+          <!-- ニックネーム -->
+          <div>
+            <label class="block text-sm font-semibold text-slate-200 mb-2">
+              <i class="fa-solid fa-signature text-amber-400 mr-2"></i>冒険者ネーム（ニックネーム） <span class="text-rose-400">*</span>
+            </label>
+            <input type="text" id="input-nickname" placeholder="例: アレックス、タカシ" maxlength="20" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400">
+          </div>
+
+          <!-- 職種 -->
+          <div>
+            <label class="block text-sm font-semibold text-slate-200 mb-2">
+              <i class="fa-solid fa-briefcase text-sky-400 mr-2"></i>現在の職種 <span class="text-rose-400">*</span>
+            </label>
+            <select id="select-job" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400">
+              <option value="" disabled selected>選択してください</option>
+              <option value="経営・経営企画">経営・経営企画</option>
+              <option value="営業">営業</option>
+              <option value="管理・事務">管理・事務</option>
+              <option value="技術">技術</option>
+              <option value="製造">製造</option>
+              <option value="マーケティング">マーケティング</option>
+              <option value="人事">人事</option>
+              <option value="その他">その他</option>
+            </select>
+          </div>
+
+          <!-- AI利用経験 -->
+          <div>
+            <label class="block text-sm font-semibold text-slate-200 mb-2">
+              <i class="fa-solid fa-wand-magic-sparkles text-purple-400 mr-2"></i>日常でのAI利用経験 <span class="text-rose-400">*</span>
+            </label>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2" id="ai-exp-options">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+
+          <div id="profile-error" class="hidden text-rose-400 text-xs font-semibold bg-rose-950/40 border border-rose-900 p-3 rounded-lg text-center"></div>
+
+          <div class="pt-4 flex justify-between items-center">
+            <button onclick="App.goToStart()" class="text-slate-400 hover:text-slate-200 text-sm font-medium px-4 py-2">
+              <i class="fa-solid fa-arrow-left mr-2"></i>戻る
+            </button>
+            <button onclick="App.submitProfile()" class="px-8 py-3 bg-amber-400 text-slate-950 font-bold rounded-xl hover:bg-amber-300 transition-colors shadow-md shadow-amber-500/20">
+              クエスト開始 <i class="fa-solid fa-dungeon ml-2"></i>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= SCREEN 3: QUEST SCREEN ================= -->
+      <section id="screen-quest" class="hidden space-y-6">
+        <!-- Quest header -->
+        <div class="flex items-center justify-between bg-slate-900/80 border border-slate-800 px-4 py-2.5 rounded-xl">
+          <div class="flex items-center gap-2">
+            <span id="quest-number-badge" class="px-2.5 py-1 bg-amber-500/20 border border-amber-500/40 text-amber-400 text-xs font-bold rounded-md font-mono">QUEST 01/12</span>
+            <span id="quest-tag" class="text-xs text-slate-400 hidden sm:inline-block">AIとの遭遇</span>
+          </div>
+          <div class="flex items-center gap-3 text-xs text-slate-400">
+            <span>残 <span id="quest-remaining-count" class="text-white font-bold">12</span> 問</span>
+            <button id="btn-sound" onclick="Game.toggleSound()" aria-label="効果音のオン・オフ" title="効果音のオン・オフ" class="w-8 h-8 rounded-lg bg-slate-950 border border-slate-700 hover:border-amber-400 text-slate-400 flex items-center justify-center">
+              <i class="fa-solid fa-volume-xmark"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Battle HUD -->
+        <div id="battle-hud" class="grid grid-cols-[1fr_auto] gap-4 items-center bg-slate-900/80 border border-slate-800 px-4 py-3 rounded-xl">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-5 gap-y-2.5">
+            <div>
+              <div class="flex justify-between text-[11px] mb-1">
+                <span class="text-rose-300 font-bold"><i class="fa-solid fa-heart mr-1"></i>HP</span>
+                <span class="font-mono text-slate-300"><span id="hud-hp">100</span>/100</span>
+              </div>
+              <div class="hud-bar"><div id="hud-hp-fill" class="hud-fill hp-fill" style="width:100%"></div></div>
+            </div>
+            <div>
+              <div class="flex justify-between text-[11px] mb-1">
+                <span class="text-sky-300 font-bold"><i class="fa-solid fa-star mr-1"></i>Lv <span id="hud-lv">1</span></span>
+                <span class="font-mono text-slate-300"><span id="hud-exp">0</span> EXP</span>
+              </div>
+              <div class="hud-bar"><div id="hud-exp-fill" class="hud-fill exp-fill" style="width:0%"></div></div>
+            </div>
+          </div>
+          <div class="flex items-center gap-3">
+            <div id="hud-combo" class="combo-badge text-center min-w-[52px] opacity-30">
+              <div class="font-title text-xl font-extrabold text-amber-300 leading-none"><span id="hud-combo-num">0</span></div>
+              <div class="text-[10px] text-amber-400/80 mt-0.5">COMBO</div>
+            </div>
+            <div id="hud-timer" class="timer-ring relative w-12 h-12" role="timer" aria-live="off">
+              <svg viewBox="0 0 44 44" class="w-12 h-12 -rotate-90">
+                <circle class="track" cx="22" cy="22" r="19" fill="none" stroke-width="4"/>
+                <circle id="hud-timer-bar" class="bar" cx="22" cy="22" r="19" fill="none" stroke-width="4" stroke-linecap="round" stroke-dasharray="119.4" stroke-dashoffset="0"/>
+              </svg>
+              <span id="hud-timer-num" class="absolute inset-0 flex items-center justify-center font-mono font-bold text-sm text-white">30</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quest Card -->
+        <div id="quest-card" class="bg-slate-900/95 border border-slate-800 p-6 sm:p-8 rounded-2xl shadow-xl rpg-frame relative">
+          <!-- Battle verdict overlay -->
+          <div id="battle-overlay" class="battle-overlay hidden" aria-live="assertive"></div>
+
+          <!-- Enemy -->
+          <div class="flex items-center gap-4 mb-5 pb-5 border-b border-slate-800/80">
+            <div class="relative flex-shrink-0">
+              <div id="quest-avatar-icon" class="w-16 h-16 rounded-2xl bg-slate-950 border border-rose-500/40 flex items-center justify-center text-3xl text-amber-400 shadow-inner">
+                <i class="fa-solid fa-dragon"></i>
+              </div>
+              <div id="dmg-layer" class="absolute inset-0"></div>
+            </div>
+            <div class="flex-grow min-w-0">
+              <div class="flex justify-between items-baseline text-xs mb-1.5 gap-2">
+                <span id="enemy-name" class="font-bold text-rose-300 truncate">モンスター</span>
+                <span class="font-mono text-slate-400 flex-shrink-0"><span id="enemy-hp">100</span>/100</span>
+              </div>
+              <div class="hud-bar"><div id="enemy-hp-fill" class="hud-fill enemy-fill" style="width:100%"></div></div>
+              <div id="enemy-hint" class="text-[11px] text-slate-500 mt-1.5">が現れた！ 時間内に行動を選ぼう</div>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-4 mb-6">
+            <div>
+              <div id="quest-title" class="text-xs font-bold text-sky-400 uppercase tracking-widest">QUEST 01</div>
+              <h3 id="quest-question" class="text-lg sm:text-xl font-bold text-white mt-1 leading-snug">
+                質問文がここに表示されます
+              </h3>
+            </div>
+          </div>
+
+          <!-- Scenario context -->
+          <div id="quest-scenario" class="text-xs sm:text-sm text-slate-400 bg-slate-950/60 p-3.5 rounded-xl border border-slate-800/80 mb-6 leading-relaxed">
+            状況説明
+          </div>
+
+          <!-- Options Container (QUEST 1-11) -->
+          <div id="quest-options" class="space-y-3">
+            <!-- Populated dynamically -->
+          </div>
+
+          <!-- QUEST 12 Free Form Container -->
+          <div id="quest-freeform" class="hidden space-y-4">
+            <div class="bg-amber-500/10 border border-amber-500/30 p-4 rounded-xl text-xs text-amber-300/90 leading-relaxed">
+              <i class="fa-solid fa-crown mr-1"></i> ラスボスクエスト：あなたの職場の知見が真の武器となる。具体的に書くほどボスに大ダメージ。制限時間はありません。
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1.5">
+                Q1. あなたの会社で、AIによって変えてみたい仕事を1つ挙げてください <span class="text-rose-400">*</span>
+              </label>
+              <input type="text" id="input-q12-target" placeholder="例: 月次の営業活動レポート作成と分析業務" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-400">
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1.5">
+                Q2. なぜそこを変えたいですか？（現状の課題） <span class="text-rose-400">*</span>
+              </label>
+              <textarea id="input-q12-reason" rows="2" placeholder="例: 手作業での集計に丸2日奪われ、本来の顧客提案や戦略検討に時間が使えていないため" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-400"></textarea>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1.5">
+                Q3. AIをどこに使えそうですか？（活用アイデア） <span class="text-rose-400">*</span>
+              </label>
+              <textarea id="input-q12-solution" rows="2" placeholder="例: CRMログからの自動ドラフト要約、および売上動向に対する一次考察コメントの自動生成" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-400"></textarea>
+            </div>
+
+            <div id="freeform-error" class="hidden text-rose-400 text-xs font-semibold bg-rose-950/40 p-2.5 rounded-lg text-center">
+              すべての入力欄を記入してください。
+            </div>
+
+            <button onclick="App.submitQuest12()" class="w-full py-3.5 bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-bold rounded-xl shadow-lg shadow-amber-500/20 text-sm">
+              とどめの一撃を放ち、キャラクターを召喚する <i class="fa-solid fa-sparkles ml-1"></i>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= SCREEN 4: SUMMONING ANIMATION ================= -->
+      <section id="screen-loading" class="hidden text-center py-16 space-y-8">
+        <div class="relative w-44 h-44 mx-auto flex items-center justify-center">
+          <!-- Magic Rune Circle -->
+          <div class="absolute inset-0 rounded-full border-2 border-dashed border-amber-400/40 animate-rune"></div>
+          <div class="absolute inset-3 rounded-full border border-sky-400/30 animate-pulse"></div>
+          <div class="w-24 h-24 rounded-full bg-gradient-to-tr from-amber-500/20 to-sky-500/20 border border-amber-400/80 flex items-center justify-center text-4xl text-amber-300 glow-gold shadow-2xl">
+            <i class="fa-solid fa-gem animate-bounce"></i>
+          </div>
+        </div>
+
+        <div class="space-y-3">
+          <span class="text-xs font-mono tracking-widest text-amber-400 uppercase">Analysis in progress...</span>
+          <h2 class="text-2xl font-bold text-white" id="loading-status-text">
+            回答データをAIコアへ融合中...
+          </h2>
+          <p class="text-xs text-slate-400 max-w-sm mx-auto">
+            あなたの6つの能力パラメータを算出し、AI時代のジョブクラスを決定しています。
+          </p>
+        </div>
+      </section>
+
+      <!-- ================= SCREEN 5: RESULT ================= -->
+      <section id="screen-result" class="hidden space-y-6 pb-12">
+        <!-- Character Master Card -->
+        <div class="bg-gradient-to-b from-slate-900 to-slate-950 border border-amber-500/40 rounded-3xl p-6 sm:p-8 shadow-2xl rpg-frame glow-gold relative overflow-hidden">
+          
+          <!-- Background insignia decoration -->
+          <div class="absolute -right-10 -bottom-10 text-9xl text-slate-800/20 pointer-events-none select-none">
+            <i class="fa-solid fa-shield-halved"></i>
+          </div>
+
+          <!-- Card Header / Title -->
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-4 mb-6">
+            <div class="flex items-center gap-2">
+              <span class="text-amber-400 font-title font-bold text-sm tracking-widest">⚔️ AI QUEST CHARACTER</span>
+              <span id="res-badge-level" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-500/20 border border-amber-500/40 text-amber-300">中級クラス</span>
+            </div>
+            <div class="text-xs text-slate-400 font-mono">
+              ADVENTURER: <span id="res-user-name" class="text-white font-bold">勇者</span>
+            </div>
+          </div>
+
+          <!-- Hero Identity -->
+          <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6 mb-8 text-center sm:text-left">
+            <div id="res-char-avatar" class="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 border-2 border-amber-400 flex items-center justify-center text-4xl sm:text-5xl text-amber-300 flex-shrink-0 glow-gold shadow-lg">
+              🧙
+            </div>
+            <div class="space-y-2">
+              <div class="inline-block px-3 py-1 rounded bg-slate-800 border border-slate-700 text-xs font-mono font-bold text-sky-400">
+                LEVEL <span id="res-level-num">48</span> / 100
+              </div>
+              <h2 id="res-char-name" class="text-2xl sm:text-3xl font-black text-white tracking-wide">
+                孤高のAIエバンジェリスト
+              </h2>
+              <p id="res-catchphrase" class="text-sm sm:text-base italic text-amber-400 font-medium">
+                「AIは使っている。でも、なぜ誰も使わない？」
+              </p>
+            </div>
+          </div>
+
+          <!-- Character description -->
+          <div class="bg-slate-950/70 border border-slate-800 rounded-xl p-4 sm:p-5 mb-8 text-slate-300 text-sm leading-relaxed" id="res-description">
+            特徴説明
+          </div>
+
+          <!-- Battle Record -->
+          <div class="mb-8">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-2 mb-3">
+              <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                <i class="fa-solid fa-trophy text-amber-400"></i> バトル戦績
+              </h3>
+              <span class="text-xs text-slate-500">診断スコアには影響しません</span>
+            </div>
+            <div id="res-battle" class="grid grid-cols-3 sm:grid-cols-6 gap-2 text-center"></div>
+            <p id="res-battle-title" class="text-xs text-amber-300/90 mt-3 text-center"></p>
+          </div>
+
+          <!-- 6 Abilities Radar / Bars Section -->
+          <div class="space-y-4 mb-8">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+              <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                <i class="fa-solid fa-chart-simple text-amber-400"></i> 6つのAI能力値ステータス
+              </h3>
+              <span class="text-xs text-slate-400">0〜100pt (★5段階評価)</span>
+            </div>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="res-abilities-container">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+
+          <!-- Strength and Growth Grid -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+            <div class="bg-slate-950/80 border border-emerald-500/30 p-4 rounded-xl">
+              <div class="flex items-center gap-2 text-emerald-400 text-xs font-bold uppercase tracking-wider mb-2">
+                <i class="fa-solid fa-bolt"></i> キャラクターの強み
+              </div>
+              <p id="res-strength" class="text-sm text-slate-200 leading-relaxed font-medium">
+                強みテキスト
+              </p>
+            </div>
+            <div class="bg-slate-950/80 border border-amber-500/30 p-4 rounded-xl">
+              <div class="flex items-center gap-2 text-amber-400 text-xs font-bold uppercase tracking-wider mb-2">
+                <i class="fa-solid fa-arrow-trend-up"></i> 成長課題・ブレイクスルー
+              </div>
+              <p id="res-growth" class="text-sm text-slate-200 leading-relaxed font-medium">
+                成長ポイント
+              </p>
+            </div>
+          </div>
+
+          <!-- NEXT QUEST -->
+          <div class="bg-gradient-to-r from-sky-950/40 to-slate-950 border border-sky-500/30 rounded-2xl p-5 mb-8">
+            <div class="flex items-center gap-2 text-sky-400 text-sm font-bold mb-3">
+              <i class="fa-solid fa-scroll"></i> 解放された NEXT QUEST（実践行動）
+            </div>
+            <div id="res-next-quests" class="space-y-2">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+
+          <!-- Recommended Training -->
+          <div class="bg-slate-950/90 border border-slate-800 rounded-xl p-4 sm:p-5 mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <span class="text-xs uppercase font-bold text-amber-400 tracking-wider">推奨研修プログラム</span>
+              <h4 id="res-training-title" class="text-base font-bold text-white mt-0.5">研修名</h4>
+              <p id="res-training-desc" class="text-xs text-slate-400 mt-1">カリキュラム概要</p>
+            </div>
+            <div class="flex-shrink-0">
+              <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-400/10 border border-amber-400/30 text-amber-300 text-xs font-bold">
+                <i class="fa-solid fa-graduation-cap"></i> ギルド推奨研修
+              </span>
+            </div>
+          </div>
+
+          <!-- Custom AI Mission (QUEST 12 output) -->
+          <div class="border-t border-slate-800 pt-6">
+            <div class="flex items-center gap-2 text-amber-400 text-xs font-bold uppercase tracking-wider mb-3">
+              <i class="fa-solid fa-building-flag"></i> 自社でAI化したい業務テーマ（討伐ミッション）
+            </div>
+            <div class="bg-slate-950/80 border border-slate-800 rounded-xl p-4 space-y-2 text-xs sm:text-sm">
+              <div>
+                <span class="text-slate-400 font-semibold">対象業務:</span>
+                <span id="res-theme-target" class="text-white ml-2 font-medium">-</span>
+              </div>
+              <div>
+                <span class="text-slate-400 font-semibold">変えたい理由:</span>
+                <span id="res-theme-reason" class="text-slate-200 ml-2">-</span>
+              </div>
+              <div>
+                <span class="text-slate-400 font-semibold">AI適用アイデア:</span>
+                <span id="res-theme-solution" class="text-sky-300 ml-2">-</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
+          <button onclick="App.copyResultToClipboard()" class="w-full sm:w-auto px-6 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-semibold text-sm transition-all flex items-center justify-center gap-2">
+            <i class="fa-solid fa-copy"></i> 結果テキストをコピー
+          </button>
+          <button onclick="App.restartQuiz()" class="w-full sm:w-auto px-8 py-3 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold text-sm transition-all shadow-md shadow-amber-500/20 flex items-center justify-center gap-2">
+            <i class="fa-solid fa-rotate-right"></i> もう一度診断する
+          </button>
+        </div>
+
+        <!-- Toast notification -->
+        <div id="toast" class="fixed bottom-6 right-6 hidden bg-emerald-500 text-slate-950 font-bold px-4 py-2.5 rounded-xl shadow-xl text-xs sm:text-sm z-50 flex items-center gap-2">
+          <i class="fa-solid fa-check"></i> <span id="toast-message">クリップボードにコピーしました！</span>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <script>
+    /* =========================================================
+       CONSTANTS & CONFIGURATION (後から変更しやすい定数設計)
+       ========================================================= */
+    const LEVEL_THRESHOLDS = {
+      BEGINNER_MAX: 39, // 0 - 39: 初級
+      INTERMEDIATE_MAX: 69, // 40 - 69: 中級
+      ADVANCED_MIN: 70 // 70 - 100: 上級
+    };
+
+    const AI_EXP_LEVELS = [
+      { id: 'none', label: 'ほぼない', desc: '日常業務ではまだ触れていない' },
+      { id: 'sometimes', label: 'たまに使う', desc: '月数回、情報検索等で試す程度' },
+      { id: 'weekly', label: '週数回', desc: '文章作成やアイデア出し等で活用' },
+      { id: 'daily', label: 'ほぼ毎日', desc: '業務フローの一部に組み込み済み' },
+      { id: 'advanced', label: '高度な活用・開発もしている', desc: 'プロンプトエンジニアリングやAPI活用' }
+    ];
+
+    /* 6能力値の定義 */
+    const ABILITIES = [
+      { key: 'knowledge', name: 'AI知識', icon: 'fa-book-bookmark', color: 'text-blue-400' },
+      { key: 'practical', name: 'AI活用', icon: 'fa-wand-magic-sparkles', color: 'text-amber-400' },
+      { key: 'discovery', name: '問題発見', icon: 'fa-magnifying-glass-chart', color: 'text-emerald-400' },
+      { key: 'process', name: '業務設計', icon: 'fa-network-wired', color: 'text-purple-400' },
+      { key: 'security', name: 'セキュリティ', icon: 'fa-shield-halved', color: 'text-rose-400' },
+      { key: 'evangelism', name: '伝道力', icon: 'fa-bullhorn', color: 'text-cyan-400' }
+    ];
+
+    /* 12のQUESTデータ（各問 4択 ＋ スコア配分0-5pt） */
+    const QUESTS = [
+      {
+        id: 1,
+        title: "QUEST 01",
+        tag: "AIとの遭遇",
+        icon: "fa-compass",
+        question: "日常業務で調べ物やアイデア出しが必要になった時、あなたはどう行動しますか？",
+        scenario: "冒険の始まり。情報の大海原を前に、未知の魔導具『AI』と対峙した。",
+        options: [
+          {
+            text: "従来通りGoogle検索や社内資料だけで解決し、AIはあまり使わない",
+            scores: { knowledge: 1, practical: 0, discovery: 1, process: 0, security: 3, evangelism: 0 }
+          },
+          {
+            text: "とりあえずAIに「いいアイデアない？」と漠然と尋ねてみる",
+            scores: { knowledge: 2, practical: 2, discovery: 2, process: 1, security: 1, evangelism: 1 }
+          },
+          {
+            text: "背景・制約条件・前提を整理したプロンプトを入力し、叩き台を生成させる",
+            scores: { knowledge: 4, practical: 4, discovery: 3, process: 3, security: 3, evangelism: 2 }
+          },
+          {
+            text: "自分用のテンプレートプロンプトを駆使し、得た回答の精度を自ら検証する",
+            scores: { knowledge: 5, practical: 5, discovery: 4, process: 4, security: 4, evangelism: 3 }
+          }
+        ]
+      },
+      {
+        id: 2,
+        title: "QUEST 02",
+        tag: "メールモンスター",
+        icon: "fa-envelope-open-text",
+        question: "顧客や上長へ送る長文・お詫び・重要交渉メールを作成する際、AIをどう用いますか？",
+        scenario: "凶暴なメールモンスターが受信トレイを埋め尽くしている！",
+        options: [
+          {
+            text: "ゼロから自分で全て手打ちで書く（AIを使う発想があまりない）",
+            scores: { knowledge: 1, practical: 0, discovery: 1, process: 1, security: 3, evangelism: 0 }
+          },
+          {
+            text: "顧客の実名や社外秘情報も含めて全文貼り付け、敬語修正を任せる",
+            scores: { knowledge: 2, practical: 3, discovery: 1, process: 2, security: 0, evangelism: 1 }
+          },
+          {
+            text: "固有名詞をマスキングした上で要点をAIに入力し、構成案や文面候補を作らせる",
+            scores: { knowledge: 4, practical: 4, discovery: 3, process: 4, security: 5, evangelism: 2 }
+          },
+          {
+            text: "定型的な状況ごとのAI作成プロンプトを整理し、チーム全体で共有している",
+            scores: { knowledge: 4, practical: 5, discovery: 4, process: 5, security: 4, evangelism: 5 }
+          }
+        ]
+      },
+      {
+        id: 3,
+        title: "QUEST 03",
+        tag: "資料ダンジョン",
+        icon: "fa-file-lines",
+        question: "50ページに及ぶ膨大な業界レポートを明日までに要約しなければなりません。どう突破しますか？",
+        scenario: "暗く深い資料ダンジョン。文字の壁が行く手を阻む。",
+        options: [
+          {
+            text: "徹夜を覚悟し、自力で斜め読みしながら手作業で要約を作る",
+            scores: { knowledge: 0, practical: 0, discovery: 1, process: 0, security: 3, evangelism: 0 }
+          },
+          {
+            text: "PDFを丸ごとAIに投げて「3行で要約して」とだけ指示する",
+            scores: { knowledge: 2, practical: 3, discovery: 2, process: 1, security: 2, evangelism: 1 }
+          },
+          {
+            text: "「自社事業に直結する論点3つ」「数値データ」を指定してAIに章ごとに構造化抽出させる",
+            scores: { knowledge: 4, practical: 5, discovery: 5, process: 4, security: 3, evangelism: 2 }
+          },
+          {
+            text: "抽出結果を検証した上で、チームメンバー向けに共有サマリー資料として再編する",
+            scores: { knowledge: 4, practical: 4, discovery: 4, process: 4, security: 3, evangelism: 5 }
+          }
+        ]
+      },
+      {
+        id: 4,
+        title: "QUEST 04",
+        tag: "ハルシネーション・ドラゴン",
+        icon: "fa-dragon",
+        question: "AIが極めて説得力のある架空の法令や偽の統計データを提示してきました。どう見抜きますか？",
+        scenario: "真実と幻影を操るハルシネーション・ドラゴンが幻覚トラップを仕掛けてきた！",
+        options: [
+          {
+            text: "AIの文章があまりに自然なので、そのまま信じて社内会議で発表する",
+            scores: { knowledge: 0, practical: 1, discovery: 0, process: 0, security: 0, evangelism: 0 }
+          },
+          {
+            text: "違和感を持ったら、もう一度AIに「これ本当？」と聞き直すだけにとどめる",
+            scores: { knowledge: 2, practical: 2, discovery: 2, process: 1, security: 2, evangelism: 1 }
+          },
+          {
+            text: "AIは嘘をつく性質（幻覚）があると理解し、必ず一次情報や公的サイトでクロスチェックする",
+            scores: { knowledge: 5, practical: 4, discovery: 4, process: 3, security: 5, evangelism: 2 }
+          },
+          {
+            text: "引用元URLの提示を必須とするプロンプトを組み、ファクトチェック運用基準をチームに策定する",
+            scores: { knowledge: 5, practical: 5, discovery: 4, process: 5, security: 5, evangelism: 5 }
+          }
+        ]
+      },
+      {
+        id: 5,
+        title: "QUEST 05",
+        tag: "情報漏えいゴブリン",
+        icon: "fa-shield-virus",
+        question: "同僚が「便利だから」と自社の顧客リストや機密コードを無償のパブリックAIに入力しようとしています。",
+        scenario: "企業の宝を奪おうと背後から情報漏えいゴブリンが忍び寄る！",
+        options: [
+          {
+            text: "特に問題を感じないので、便利な使い道として見守る",
+            scores: { knowledge: 0, practical: 1, discovery: 0, process: 0, security: 0, evangelism: 0 }
+          },
+          {
+            text: "なんとなく危ない気がするが、社内ルールを知らないので何も言えない",
+            scores: { knowledge: 2, practical: 1, discovery: 2, process: 1, security: 2, evangelism: 0 }
+          },
+          {
+            text: "オプトアウトや企業向けプランの学習遮断規約を説明し、即座に入力を止めるよう促す",
+            scores: { knowledge: 5, practical: 3, discovery: 3, process: 2, security: 5, evangelism: 4 }
+          },
+          {
+            text: "安全に業務で活用できる公式ガイドラインやセキュアなAIツールの導入を推進する",
+            scores: { knowledge: 5, practical: 4, discovery: 4, process: 5, security: 5, evangelism: 5 }
+          }
+        ]
+      },
+      {
+        id: 6,
+        title: "QUEST 06",
+        tag: "時間泥棒",
+        icon: "fa-hourglass-half",
+        question: "毎週繰り返される定例報告資料の作成やデータ転記。あなたの立ち向かい方は？",
+        scenario: "毎週決まった時間に現れ、冒険者の生命力（業務時間）を吸い取る時間泥棒！",
+        options: [
+          {
+            text: "「仕事とはそういうものだ」と受け入れ、毎回手作業で耐える",
+            scores: { knowledge: 0, practical: 0, discovery: 0, process: 0, security: 2, evangelism: 0 }
+          },
+          {
+            text: "AIに「報告書の書き方を教えて」と聞いて少し早く書けるようにする",
+            scores: { knowledge: 2, practical: 2, discovery: 2, process: 1, security: 2, evangelism: 1 }
+          },
+          {
+            text: "データ集計→骨子作成→文章化の流れを整理し、AIで自動化できる部分を特定する",
+            scores: { knowledge: 4, practical: 4, discovery: 5, process: 5, security: 3, evangelism: 2 }
+          },
+          {
+            text: "マクロやノーコード、AI連携を組み合わせて定期タスクの半自動化ワークフローを完成させる",
+            scores: { knowledge: 5, practical: 5, discovery: 5, process: 5, security: 3, evangelism: 4 }
+          }
+        ]
+      },
+      {
+        id: 7,
+        title: "QUEST 07",
+        tag: "業務分解ダンジョン",
+        icon: "fa-diagram-project",
+        question: "「自部署の仕事をAIで効率化せよ」とミッションが下りました。最初の第一歩は？",
+        scenario: "複雑怪奇な業務分解ダンジョン。どこから手をつけるべきか？",
+        options: [
+          {
+            text: "最新の話題のAIツールを片っ端からインストールしてみる",
+            scores: { knowledge: 2, practical: 2, discovery: 1, process: 0, security: 1, evangelism: 1 }
+          },
+          {
+            text: "部署のメンバーに「AIで楽になりたいことある？」と雑談で聞いてみる",
+            scores: { knowledge: 2, practical: 2, discovery: 3, process: 2, security: 2, evangelism: 3 }
+          },
+          {
+            text: "業務プロセスを「インプット・判断・アウトプット」に細分化し、AI向きタスクを棚卸しする",
+            scores: { knowledge: 4, practical: 4, discovery: 5, process: 5, security: 3, evangelism: 3 }
+          },
+          {
+            text: "ROI（投資対効果）とリスクを評価した上で、優先度の高い業務改革ロードマップを引く",
+            scores: { knowledge: 4, practical: 4, discovery: 5, process: 5, security: 4, evangelism: 5 }
+          }
+        ]
+      },
+      {
+        id: 8,
+        title: "QUEST 08",
+        tag: "AI丸投げモンスター",
+        icon: "fa-robot",
+        question: "「新規事業プランを考えて」とAIに一言投げて出力された企画書。あなたならどうしますか？",
+        scenario: "表面だけ整った中身のない提案を押し付けるAI丸投げモンスターが出現！",
+        options: [
+          {
+            text: "賢そうな文章なので、内容を精査せずそのまま上司へ提出する",
+            scores: { knowledge: 1, practical: 1, discovery: 0, process: 0, security: 1, evangelism: 0 }
+          },
+          {
+            text: "ありきたりな内容に落胆し、「AIはやっぱり仕事に使えない」と諦める",
+            scores: { knowledge: 1, practical: 1, discovery: 1, process: 1, security: 2, evangelism: 0 }
+          },
+          {
+            text: "AIを壁打ち相手（ペルソナや批判者）として多角的に問答を重ね、自らの仮説を磨き上げる",
+            scores: { knowledge: 4, practical: 5, discovery: 4, process: 4, security: 3, evangelism: 2 }
+          },
+          {
+            text: "顧客課題と自社の強みを注入し、AIアウトプットと現場の一次情報を融合した独自企画に昇華する",
+            scores: { knowledge: 5, practical: 5, discovery: 5, process: 5, security: 4, evangelism: 4 }
+          }
+        ]
+      },
+      {
+        id: 9,
+        title: "QUEST 09",
+        tag: "孤高のエバンジェリストの試練",
+        icon: "fa-person-chalkboard",
+        question: "あなたはAIを活用して仕事が3倍速くなりました。しかし周囲の同僚は誰も使っていません。",
+        scenario: "自分だけがレベルアップし、孤立しかけているギルドの試練。",
+        options: [
+          {
+            text: "自分だけ早く仕事を終えて定時で帰り、秘密にしておく",
+            scores: { knowledge: 4, practical: 5, discovery: 2, process: 2, security: 2, evangelism: 0 }
+          },
+          {
+            text: "「なぜみんなAIを使わないの？」と周囲を少し批判的な目で見てしまう",
+            scores: { knowledge: 4, practical: 4, discovery: 2, process: 2, security: 2, evangelism: 1 }
+          },
+          {
+            text: "困っている同僚に「ここだけAI使うと5分で終わるよ」と小さな成功体験をプレゼントする",
+            scores: { knowledge: 4, practical: 4, discovery: 4, process: 4, security: 3, evangelism: 5 }
+          },
+          {
+            text: "部署向けのミニ勉強会を企画し、業務ですぐ使えるプロンプト集を整備して配る",
+            scores: { knowledge: 5, practical: 5, discovery: 4, process: 5, security: 4, evangelism: 5 }
+          }
+        ]
+      },
+      {
+        id: 10,
+        title: "QUEST 10",
+        tag: "現場モンスター",
+        icon: "fa-hand-fist",
+        question: "現場のベテランから「AIなんて信用できない。昔ながらのやり方が一番確実だ」と猛反発を受けました。",
+        scenario: "変化を頑なに拒む現場の重鎮ガーディアンとの遭遇！",
+        options: [
+          {
+            text: "対立を恐れて、AIの導入や提案を諦めて元のやり方に戻す",
+            scores: { knowledge: 1, practical: 1, discovery: 1, process: 1, security: 2, evangelism: 0 }
+          },
+          {
+            text: "「時代遅れです」と正論で論破しようとして関係を悪化させる",
+            scores: { knowledge: 3, practical: 3, discovery: 1, process: 1, security: 2, evangelism: 1 }
+          },
+          {
+            text: "相手の不安や職人技への誇りに傾聴し、面倒な下準備だけをAIに代行させる協調案を出す",
+            scores: { knowledge: 4, practical: 4, discovery: 5, process: 5, security: 3, evangelism: 5 }
+          },
+          {
+            text: "小さなパイロット運用で圧倒的な精度と時間削減を実証し、相手を味方に巻き込む",
+            scores: { knowledge: 5, practical: 5, discovery: 5, process: 5, security: 4, evangelism: 5 }
+          }
+        ]
+      },
+      {
+        id: 11,
+        title: "QUEST 11",
+        tag: "AI錬金術",
+        icon: "fa-flask-vial",
+        question: "社内に眠る膨大な過去議事録や日報データを、新たな価値（売上や改善）に変えるには？",
+        scenario: "埃をかぶったデータの山。賢者はこれを黄金に変えるという。",
+        options: [
+          {
+            text: "ファイルサーバーの容量を圧迫しているだけなので、古いものは消せばいいと思う",
+            scores: { knowledge: 0, practical: 0, discovery: 0, process: 0, security: 2, evangelism: 0 }
+          },
+          {
+            text: "検索キーワードで必要な時にたまに探すくらいにとどまっている",
+            scores: { knowledge: 2, practical: 2, discovery: 2, process: 1, security: 2, evangelism: 1 }
+          },
+          {
+            text: "AI（RAGや社内ナレッジ検索）を用いて、過去の失注理由や成功ナレッジを瞬時に参照可能にする",
+            scores: { knowledge: 5, practical: 5, discovery: 5, process: 4, security: 4, evangelism: 3 }
+          },
+          {
+            text: "データを体系化してAIに食わせ、新入社員でもベテラン並みの判断ができる支援体制を設計する",
+            scores: { knowledge: 5, practical: 5, discovery: 5, process: 5, security: 4, evangelism: 5 }
+          }
+        ]
+      }
+    ];
+
+    /* 12キャラクターのマスター辞書 */
+    const CHARACTERS = {
+      apprentice: {
+        id: 'apprentice',
+        name: 'AI見習い',
+        avatar: '🌱',
+        catchphrase: '「AIの扉を開けたばかり。これから世界が変わる」',
+        description: 'AIの存在を知り、活用への興味を持ち始めた段階です。まだ日常的な武器にはなっていませんが、素直な探究心と吸収力が最大の武器です。',
+        strength: '新しい技術に対する柔軟な好奇心と、先入観のない受容力。',
+        growth: '「まずAIに投げてみる」小さな成功体験を積み重ね、抵抗感をゼロにする。',
+        trainingTitle: '初級：ビジネスパーソンのための生成AI基礎・プロンプト初歩',
+        trainingDesc: 'ChatGPT等の基本構造、安全な利用ルール、明日から使える定番プロンプトの習得。',
+        nextQuests: [
+          'AIに任せられる日常の定型業務を3つ発見する',
+          'AIでメールの返信文や挨拶文を1本作ってみる',
+          '長文記事や資料をAIで箇条書き要約してみる'
+        ]
+      },
+      explorer: {
+        id: 'explorer',
+        name: 'AI探検家',
+        avatar: '🧭',
+        catchphrase: '「未知のプロンプトを求めて、今日もツールを開く」',
+        description: '様々なAIツールを積極的に試し、どんなことができるかフットワーク軽く検証できる冒険者です。',
+        strength: '新しいツールやアップデートに臆せず飛び込む高い行動力。',
+        growth: '試行錯誤で終わらせず、「どの業務をどう短縮できたか」定量的な成果にこだわる。',
+        trainingTitle: '初・中級：成果を出すためのプロンプト応用とツール活用術',
+        trainingDesc: '業務目的に合わせたツールの使い分けと、精度の高いプロンプト設計スキルの習得。',
+        nextQuests: [
+          '新しいAIツールを1つ試して業務の使い道を検証する',
+          '自分の得意な定番プロンプトを3つストックする',
+          '同僚に「これ便利だよ」と1つの使い方をシェアする'
+        ]
+      },
+      craftsman: {
+        id: 'craftsman',
+        name: 'AI職人',
+        avatar: '⚒️',
+        catchphrase: '「このプロンプトの一言が、最高の成果物を生む」',
+        description: '細部までこだわり抜いたプロンプトを編み出し、質の高いアウトプットを職人技のように引き出す達人です。',
+        strength: '精密な指示出し技術と、AIの回答品質を見極める高い審美眼。',
+        growth: '職人芸を属人化させず、誰もが使えるように仕組み化・言語化すること。',
+        trainingTitle: '中級：プロンプトエンジニアリング＆業務テンプレート開発',
+        trainingDesc: '再利用性の高い指示書作成、マークダウンを活用した構造化プロンプトの標準化。',
+        nextQuests: [
+          '自分が愛用しているプロンプトを誰でも使えるマニュアルにする',
+          '生成物のチェックリストを作り、品質の再現性を高める',
+          'チーム内のよくある質問にプロンプトで答える'
+        ]
+      },
+      detective: {
+        id: 'detective',
+        name: 'AI探偵',
+        avatar: '🕵️',
+        catchphrase: '「ハルシネーションを見破り、真実のデータだけを抽出する」',
+        description: 'AIの弱点であるハルシネーションやセキュリティリスクに極めて敏感で、確実なファクトチェックを行う冷静な守護者です。',
+        strength: '高いリスクリテラシー、批判的思考（クリティカルシンキング）と正確性。',
+        growth: 'リスクを回避するだけでなく、「どうすれば安全に攻めの活用ができるか」を設計する。',
+        trainingTitle: '中級：AIガバナンス・セキュリティとファクトチェック実践',
+        trainingDesc: '情報漏えい防止対策、著作権・肖像権の注意点、ハルシネーション抑制技法。',
+        nextQuests: [
+          'チーム内のAI利用チェックリスト（安全基準）を策定する',
+          'AIの回答を一次ソースと突き合わせる検証フローを構築する',
+          '安全なAI利用ガイドを部署内に周知する'
+        ]
+      },
+      dataAlchemist: {
+        id: 'dataAlchemist',
+        name: 'データ錬金術師',
+        avatar: '🔮',
+        catchphrase: '「散らばる数字とログから、黄金のインサイトを精錬する」',
+        description: 'エクセルや散在する社内ログをAIに読み込ませ、人間では見落とす傾向や相関関係を瞬時に炙り出すデータ分析のスペシャリストです。',
+        strength: 'データへの深い理解と、AIを用いた高速な可視化・分析力。',
+        growth: '分析結果を専門用語抜きで経営層や現場に分かりやすく伝え、行動を促すこと。',
+        trainingTitle: '中・上級：生成AIを活用したデータ分析・業務インサイト抽出',
+        trainingDesc: 'Code Interpreterやデータ分析ツールの実践活用、意思決定に直結する可視化。',
+        nextQuests: [
+          '過去の蓄積データからAIで売上・解約傾向の仮説を出す',
+          '定例の集計グラフ作成をAIで半自動化する',
+          '分析結果から具体的なネクストアクションを3つ提案する'
+        ]
+      },
+      loneEvangelist: {
+        id: 'loneEvangelist',
+        name: '孤高のAIエバンジェリスト',
+        avatar: '🧙',
+        catchphrase: '「AIは使っている。でも、なぜ誰も使わない？」',
+        description: '自身は極めて高度にAIを操り爆速で業務をこなしていますが、そのノウハウが周囲に伝わらず、一人で突っ走りがちになっています。',
+        strength: '突出したAI活用力と自走力。個人の業務効率は圧倒的。',
+        growth: '「AIを自分だけの武器にしない」。他者を巻き込み、チームの力に変える伝道力。',
+        trainingTitle: '中級：AI業務改善・チーム活用＆社内展開ファシリテーション',
+        trainingDesc: '周囲の心理的ハードルを下げるアプローチ、小さな成功事例の社内拡散術。',
+        nextQuests: [
+          'AIを使う仲間（フォロワー）を部署内で3人増やす',
+          '同僚の面倒な作業を1つAIで手伝って感動体験を共有する',
+          '社内チャットに「今日役立ったAI事例」をライトに投稿する'
+        ]
+      },
+      ranger: {
+        id: 'ranger',
+        name: 'AIレンジャー',
+        avatar: '🏹',
+        catchphrase: '「現場のリアルな泥臭い課題こそ、AIの矢で射抜く」',
+        description: '現場のオペレーションに精通し、実際の現場課題に即した現実的で効果的なAI活用を素早く仕掛ける実務家です。',
+        strength: '現場目線とスピード感。実効性の高い課題発見力。',
+        growth: '単発の課題解決にとどまらず、部門横断の仕組みへとスケールさせること。',
+        trainingTitle: '中級：現場主導のAIカイゼン・業務フロー再構築',
+        trainingDesc: '現場のムダ取り手法とAIの組み合わせ、小さな改善を継続するアジャイル業務設計。',
+        nextQuests: [
+          '現場の「面倒くさい」ルーチンワークを3つ特定する',
+          '現場メンバーと一緒にAIプロンプトをテスト運用する',
+          '改善前後の時間削減効果を数値で測定して報告する'
+        ]
+      },
+      strategist: {
+        id: 'strategist',
+        name: 'AI軍師',
+        avatar: '📜',
+        catchphrase: '「業務を分解せよ。人とAIの布陣が決まれば勝てる」',
+        description: '業務プロセス全体を俯瞰し、「どこを人がやり、どこをAIに委ねるか」の最適配置をロジカルに描く戦略家です。',
+        strength: '高い業務設計力、構造化思考、論理的な問題発見能力。',
+        growth: '完璧な設計図を描くだけでなく、現場を動かす情熱的な巻き込み力を磨くこと。',
+        trainingTitle: '上級：AI時代の業務再設計（BPR）と組織アライメント',
+        trainingDesc: 'End-to-Endの業務プロセスマッピング、人とAIの協働モデルの設計。',
+        nextQuests: [
+          '自部署のコア業務を「インプット・思考・アウトプット」に完全分解する',
+          'タスクを「人・AI・自動化」の3つに再分類する',
+          '人とAIが連携する新業務フロー図を1本完成させる'
+        ]
+      },
+      alchemist: {
+        id: 'alchemist',
+        name: 'AI錬金術師',
+        avatar: '🧪',
+        catchphrase: '「既存の業務とAIを混ぜ合わせ、新たな価値を創造する」',
+        description: '業務知識とAI技術を柔軟に掛け合わせ、これまでにない革新的なアプローチやアウトプットを次々と創り出す変革者です。',
+        strength: '高い創造性と応用力。既存の枠組みにとらわれない越境思考。',
+        growth: 'アイデアの創出だけでなく、セキュリティとガバナンスを意識した堅牢な運用。',
+        trainingTitle: '上級：生成AI×イノベーション創出ワークショップ',
+        trainingDesc: '新規事業アイデア出し、製品・サービスへのAI機能組み込み検討フレームワーク。',
+        nextQuests: [
+          'AIを使った新しい社内サービスや業務支援アイデアを企画書にする',
+          '異なる部署の課題とAI技術を組み合わせた解決策を提案する',
+          'AI活用のプロトタイプを1週間で試作してみる'
+        ]
+      },
+      guildMaster: {
+        id: 'guildMaster',
+        name: 'AIギルドマスター',
+        avatar: '👑',
+        catchphrase: '「全員がAIを相棒にできるギルド（組織）を創る」',
+        description: '高いAIリテラシーに加え、組織全体を動かす求心力と伝道力を持ち、企業全体のAIシフトを率いるリーダーです。',
+        strength: '卓越した伝道力、組織変革マインド、人間力と推進力。',
+        growth: '現場の熱量を維持しつつ、経営戦略や全社KPIと整合した持続可能な体制を維持する。',
+        trainingTitle: '上級：全社AI推進リーダーシップ・コミュニティ運営実践',
+        trainingDesc: 'AI推進組織（CoE）の立ち上げ、アンバサダー育成、社内表彰・評価制度の設計。',
+        nextQuests: [
+          '部署横断のAIアンバサダーコミュニティを立ち上げる',
+          '全社向けAI活用コンテストや成果共有会を企画・開催する',
+          '経営陣に対し、AI導入の全社インパクトと投資対効果を提言する'
+        ]
+      },
+      producer: {
+        id: 'producer',
+        name: 'AIプロデューサー',
+        avatar: '🎬',
+        catchphrase: '「技術を事業の成果へとプロデュースする」',
+        description: '顧客価値や事業インパクトを中心に据え、AIを使ってビジネスモデルそのものを進化させるビジネスプロデューサーです。',
+        strength: 'ビジネス構想力、市場ニーズへの嗅覚、マネタイズ設計力。',
+        growth: '技術的なディテールやアーキテクチャの実現可能性への解像度を一段深める。',
+        trainingTitle: '上級：AIビジネスプロデュース・新規事業開発講座',
+        trainingDesc: 'AIネイティブな事業モデル設計、ビジネスROI試算、パートナーシップ構築。',
+        nextQuests: [
+          '顧客向け既存サービスにAIを組み込んだ新プランを設計する',
+          'AI活用による年間コスト削減または売上向上予測を試算する',
+          '経営会議でAI事業トランスフォーメーションのロードマップをプレゼンする'
+        ]
+      },
+      architect: {
+        id: 'architect',
+        name: 'AIアーキテクト',
+        avatar: '🏛️',
+        catchphrase: '「セキュアで強固な基盤の上にこそ、真のAI活用が宿る」',
+        description: 'セキュリティ、API連携、システム構成を極めて高いレベルで理解し、企業全体のAI基盤を安全かつ堅牢に設計できる技術リーダーです。',
+        strength: '圧倒的な技術理解度、システム統合力、高度なセキュリティ設計力。',
+        growth: '難解な技術用語を噛み砕き、非エンジニアの現場や経営層と対話する共感力。',
+        trainingTitle: '上級：エンタープライズAIアーキテクチャ・RAG/LLM統合実践',
+        trainingDesc: 'セキュアな社内LLM基盤、RAG設計、API連携による自動化パイプライン構築。',
+        nextQuests: [
+          '社内システムとLLMをAPI連携するPoCアーキテクチャを設計する',
+          '全社の情報漏えいを防ぐLLMセキュリティ監査要件を策定する',
+          '非IT部門向けに「AIの裏側の仕組み」を優しく解説する勉強会を開く'
+        ]
+      }
+    };
+
+    /**
+     * AI評価エンジン（将来Gemini APIなどのLLMによる定性推論にも差し替え可能な設計）
+     * @param {Object} scores - 6つの正規化済み能力値 (0-100)
+     * @param {Object} profile - ユーザープロフィール
+     * @returns {Object} 判定されたキャラクターオブジェクト
+     */
+    function evaluateCharacter(scores, profile) {
+      const { knowledge, practical, discovery, process, security, evangelism } = scores;
+
+      // 特殊条件1: 孤高のAIエバンジェリスト（仕様明記の優先ルール）
+      // AI活用 >= 80, AI知識 >= 75, 伝道力 < 50
+      if (practical >= 80 && knowledge >= 75 && evangelism < 50) {
+        return CHARACTERS.loneEvangelist;
+      }
+
+      // 特殊条件2: AIギルドマスター（全社を率いるリーダー）
+      if (evangelism >= 75 && process >= 70 && practical >= 70) {
+        return CHARACTERS.guildMaster;
+      }
+
+      // 特殊条件3: AIアーキテクト（高技術・高セキュリティ）
+      if (security >= 75 && knowledge >= 80 && process >= 70) {
+        return CHARACTERS.architect;
+      }
+
+      // 特殊条件4: AIプロデューサー（経営・マーケ志向 & 高業務設計・問題発見）
+      if (discovery >= 75 && process >= 75 && (profile.job === '経営・経営企画' || profile.job === 'マーケティング' || practical >= 70)) {
+        return CHARACTERS.producer;
+      }
+
+      // 特殊条件5: AI軍師（高い業務設計・問題発見）
+      if (process >= 75 && discovery >= 70) {
+        return CHARACTERS.strategist;
+      }
+
+      // 特殊条件6: データ錬金術師（高知識・高問題発見 & 技術職寄り）
+      if (knowledge >= 70 && discovery >= 70 && practical >= 60) {
+        return CHARACTERS.dataAlchemist;
+      }
+
+      // 特殊条件7: AI錬金術師（高活用・高発見）
+      if (practical >= 75 && discovery >= 65) {
+        return CHARACTERS.alchemist;
+      }
+
+      // 特殊条件8: AI探偵（高セキュリティ・高知識）
+      if (security >= 70 && knowledge >= 60) {
+        return CHARACTERS.detective;
+      }
+
+      // 特殊条件9: AI職人（高活用・高プロンプト志向）
+      if (practical >= 70 && process >= 55) {
+        return CHARACTERS.craftsman;
+      }
+
+      // 特殊条件10: AIレンジャー（現場実践派）
+      if (discovery >= 55 && practical >= 50) {
+        return CHARACTERS.ranger;
+      }
+
+      // 特殊条件11: AI探検家（中級エントリー）
+      if (practical >= 40 || knowledge >= 40) {
+        return CHARACTERS.explorer;
+      }
+
+      // デフォルト: AI見習い
+      return CHARACTERS.apprentice;
+    }
+
+    /* =========================================================
+       APPLICATION STATE & CONTROLLER
+       ========================================================= */
+    /* =========================================================
+       GAME LAYER（演出専用。診断スコア rawScores には一切影響しない）
+       ========================================================= */
+    const GAME_CONFIG = {
+      TIME_LIMIT_SEC: 30,        // 1問あたりの制限時間
+      SPEED_BONUS_MAX: 50,       // 即答時の最大スピードボーナスEXP
+      COMBO_STEP: 0.2,           // コンボ1つにつきEXP倍率 +20%
+      DMG_COUNTER: 18,           // 反撃を受けた時のHPダメージ
+      DMG_GRAZE: 8,              // 倒しきれなかった時のHPダメージ
+      DMG_TIMEOUT: 10,           // 時間切れのHPダメージ
+      REVIVE_HP: 40,             // HP0で復活する時のHP
+      EXP_PER_LEVEL: 180         // レベルアップに必要なEXP
+    };
+
+    const ENEMIES = [
+      { name: '迷いの霧ゴースト' },
+      { name: 'メールモンスター' },
+      { name: '資料ダンジョンの番人' },
+      { name: 'ハルシネーション・ドラゴン' },
+      { name: '情報漏えいゴブリン' },
+      { name: '時間泥棒' },
+      { name: '業務分解ゴーレム' },
+      { name: 'AI丸投げモンスター' },
+      { name: '孤立の亡霊' },
+      { name: '現場の鉄壁オーガ' },
+      { name: '眠れるデータの大蛇' }
+    ];
+    const BOSS = { name: '変わらない組織の魔王', hp: 100 };
+
+    /* 効果音（WebAudio・外部ファイル不要・初期はミュート） */
+    const Sfx = {
+      ctx: null, on: false,
+      tone(freq, dur = 0.12, type = 'square', vol = 0.06, delay = 0) {
+        if (!this.on) return;
+        try {
+          this.ctx = this.ctx || new (window.AudioContext || window.webkitAudioContext)();
+          const t = this.ctx.currentTime + delay;
+          const o = this.ctx.createOscillator(), g = this.ctx.createGain();
+          o.type = type; o.frequency.setValueAtTime(freq, t);
+          g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+          o.connect(g).connect(this.ctx.destination); o.start(t); o.stop(t + dur);
+        } catch (e) { /* 音が出せない環境では無視 */ }
+      },
+      hit()      { this.tone(220, .08, 'square'); this.tone(330, .1, 'square', .05, .06); },
+      critical() { [523, 659, 784, 1046].forEach((f, i) => this.tone(f, .12, 'square', .05, i * .06)); },
+      hurt()     { this.tone(140, .25, 'sawtooth', .07); },
+      tick()     { this.tone(880, .04, 'sine', .03); },
+      levelup()  { [392, 523, 659, 784, 1046].forEach((f, i) => this.tone(f, .15, 'triangle', .07, i * .08)); },
+      boss()     { [110, 98, 82].forEach((f, i) => this.tone(f, .3, 'sawtooth', .06, i * .2)); }
+    };
+
+    const Game = {
+      s: null,
+      reset() {
+        this.stopTimer();
+        this.s = { hp: 100, exp: 0, combo: 0, maxCombo: 0, kills: 0, crits: 0, revives: 0,
+                   timeouts: 0, enemyHp: 100, bossHp: BOSS.hp, bossDefeated: false,
+                   timeLeft: GAME_CONFIG.TIME_LIMIT_SEC, timedOut: false, locked: false };
+        this.renderHud();
+      },
+      level(exp = this.s.exp) { return Math.floor(exp / GAME_CONFIG.EXP_PER_LEVEL) + 1; },
+
+      toggleSound() {
+        Sfx.on = !Sfx.on;
+        const b = document.getElementById('btn-sound');
+        b.innerHTML = `<i class="fa-solid ${Sfx.on ? 'fa-volume-high text-amber-400' : 'fa-volume-xmark'}"></i>`;
+        if (Sfx.on) Sfx.tick();
+      },
+
+      renderHud() {
+        const s = this.s;
+        document.getElementById('hud-hp').textContent = s.hp;
+        const hpFill = document.getElementById('hud-hp-fill');
+        hpFill.style.width = s.hp + '%';
+        hpFill.classList.toggle('low', s.hp <= 30);
+        document.getElementById('hud-lv').textContent = this.level();
+        document.getElementById('hud-exp').textContent = s.exp;
+        document.getElementById('hud-exp-fill').style.width = ((s.exp % GAME_CONFIG.EXP_PER_LEVEL) / GAME_CONFIG.EXP_PER_LEVEL * 100) + '%';
+        document.getElementById('hud-combo-num').textContent = s.combo;
+        document.getElementById('hud-combo').style.opacity = s.combo > 0 ? '1' : '.3';
+      },
+
+      setEnemy(name, hp, hint) {
+        document.getElementById('enemy-name').textContent = name;
+        document.getElementById('enemy-hp').textContent = hp;
+        document.getElementById('enemy-hp-fill').style.width = hp + '%';
+        document.getElementById('enemy-hint').textContent = hint;
+        const av = document.getElementById('quest-avatar-icon');
+        av.classList.remove('fx-defeat', 'fx-shake');
+      },
+
+      /* ---- タイマー ---- */
+      startTimer() {
+        this.stopTimer();
+        const limit = GAME_CONFIG.TIME_LIMIT_SEC;
+        this.s.timeLeft = limit; this.s.timedOut = false;
+        const ring = document.getElementById('hud-timer');
+        const bar = document.getElementById('hud-timer-bar');
+        const num = document.getElementById('hud-timer-num');
+        ring.style.opacity = '1';
+        ring.classList.remove('warn');
+        const C = 119.4, startAt = performance.now();
+        let lastSec = limit;
+        this._timer = setInterval(() => {
+          const left = Math.max(0, limit - (performance.now() - startAt) / 1000);
+          this.s.timeLeft = left;
+          bar.style.strokeDashoffset = C * (1 - left / limit);
+          const sec = Math.ceil(left);
+          num.textContent = sec;
+          if (sec <= 5) { ring.classList.add('warn'); if (sec !== lastSec && sec > 0) Sfx.tick(); }
+          lastSec = sec;
+          if (left <= 0) { this.stopTimer(); this.onTimeout(); }
+        }, 100);
+      },
+      stopTimer() { if (this._timer) { clearInterval(this._timer); this._timer = null; } },
+      hideTimer() { this.stopTimer(); document.getElementById('hud-timer').style.opacity = '.25'; document.getElementById('hud-timer-num').textContent = '∞'; },
+
+      onTimeout() {
+        this.s.timedOut = true; this.s.timeouts++;
+        this.s.combo = 0;
+        this.damagePlayer(GAME_CONFIG.DMG_TIMEOUT);
+        document.getElementById('enemy-hint').textContent = '時間切れ！ 敵の先制攻撃。まだ回答はできます（スピードボーナスなし）';
+        this.renderHud();
+      },
+
+      damagePlayer(n) {
+        this.s.hp = Math.max(0, this.s.hp - n);
+        const card = document.getElementById('quest-card');
+        card.classList.remove('fx-hit'); void card.offsetWidth; card.classList.add('fx-hit');
+        Sfx.hurt();
+        if (this.s.hp === 0) {
+          this.s.revives++;
+          this.s.hp = GAME_CONFIG.REVIVE_HP;
+          setTimeout(() => App.showToast(`仲間の回復魔法でHP${GAME_CONFIG.REVIVE_HP}まで復活！ 冒険は続く`), 300);
+        }
+      },
+
+      popDamage(text, color) {
+        const layer = document.getElementById('dmg-layer');
+        const el = document.createElement('div');
+        el.className = 'dmg-pop'; el.style.color = color; el.textContent = text;
+        layer.appendChild(el);
+        setTimeout(() => el.remove(), 1000);
+      },
+
+      gainExp(n) {
+        const before = this.level();
+        this.s.exp += n;
+        const after = this.level();
+        if (after > before) {
+          setTimeout(() => {
+            Sfx.levelup();
+            const t = document.createElement('div');
+            t.className = 'levelup-toast px-5 py-2.5 rounded-xl bg-sky-500 text-slate-950 font-black shadow-xl shadow-sky-500/30';
+            t.innerHTML = `<i class="fa-solid fa-arrow-up mr-1"></i>LEVEL UP!  Lv ${after}`;
+            document.body.appendChild(t);
+            setTimeout(() => t.remove(), 1700);
+          }, 450);
+        }
+      },
+
+      /* ---- 選択肢の判定（各問の中での相対評価）---- */
+      resolveAttack(quest, option) {
+        const sum = o => Object.values(o.scores).reduce((a, b) => a + b, 0);
+        const sums = quest.options.map(sum);
+        const max = Math.max(...sums), min = Math.min(...sums);
+        const q = max === min ? 1 : (sum(option) - min) / (max - min); // 0〜1
+        const dmg = Math.round(25 + q * 75);                           // 敵へのダメージ 25〜100
+        let tier;
+        if (q >= 0.9) tier = 'critical';
+        else if (q >= 0.55) tier = 'kill';
+        else if (q >= 0.25) tier = 'graze';
+        else tier = 'counter';
+        return { q, dmg, tier };
+      },
+
+      attack(quest, option, onDone) {
+        const s = this.s;
+        s.locked = true;
+        const timedOut = s.timedOut;
+        const speedFrac = timedOut ? 0 : s.timeLeft / GAME_CONFIG.TIME_LIMIT_SEC;
+        this.stopTimer();
+
+        const r = this.resolveAttack(quest, option);
+        const av = document.getElementById('quest-avatar-icon');
+        s.enemyHp = Math.max(0, 100 - r.dmg);
+        document.getElementById('enemy-hp').textContent = s.enemyHp;
+        document.getElementById('enemy-hp-fill').style.width = s.enemyHp + '%';
+
+        let label, sub, color;
+        const win = r.tier === 'critical' || r.tier === 'kill';
+        if (win) {
+          s.combo++; s.kills++; s.maxCombo = Math.max(s.maxCombo, s.combo);
+          if (r.tier === 'critical') { s.crits++; Sfx.critical(); } else Sfx.hit();
+          av.classList.add('fx-defeat');
+          label = r.tier === 'critical' ? '会心の一撃！' : '撃破！';
+          sub = `${ENEMIES[App.state.currentQuestIndex].name}を倒した`;
+          color = r.tier === 'critical' ? '#fde68a' : '#f59e0b';
+        } else {
+          s.combo = 0;
+          Sfx.hit();
+          av.classList.add('fx-shake');
+          if (r.tier === 'graze') {
+            label = 'あと一歩…'; sub = '敵は逃げていった'; color = '#38bdf8';
+            setTimeout(() => this.damagePlayer(GAME_CONFIG.DMG_GRAZE), 350);
+          } else {
+            label = '反撃を受けた！'; sub = '敵はまだ立っている'; color = '#f43f5e';
+            setTimeout(() => this.damagePlayer(GAME_CONFIG.DMG_COUNTER), 350);
+          }
+        }
+        this.popDamage(`-${r.dmg}`, color);
+
+        const base = Math.round(30 + r.q * 70);
+        const speed = Math.round(GAME_CONFIG.SPEED_BONUS_MAX * speedFrac);
+        const mult = 1 + GAME_CONFIG.COMBO_STEP * Math.max(0, s.combo - 1);
+        const gained = Math.round((base + speed) * mult);
+        this.gainExp(gained);
+
+        const combo = document.getElementById('hud-combo');
+        if (s.combo > 1) { combo.classList.add('bump'); setTimeout(() => combo.classList.remove('bump'), 200); }
+
+        const ov = document.getElementById('battle-overlay');
+        ov.innerHTML = `
+          <div class="verdict text-center px-4">
+            <div class="font-title text-3xl sm:text-4xl font-extrabold" style="color:${color}">${label}</div>
+            <div class="text-sm text-slate-300 mt-1">${sub}</div>
+            <div class="mt-4 inline-flex flex-wrap justify-center gap-2 text-xs">
+              <span class="px-2.5 py-1 rounded-md bg-sky-500/15 border border-sky-500/40 text-sky-300 font-bold">+${gained} EXP</span>
+              ${speed > 0 ? `<span class="px-2.5 py-1 rounded-md bg-slate-800 border border-slate-700 text-slate-300">スピード +${speed}</span>` : ''}
+              ${s.combo > 1 ? `<span class="px-2.5 py-1 rounded-md bg-amber-500/15 border border-amber-500/40 text-amber-300 font-bold">${s.combo} COMBO ×${mult.toFixed(1)}</span>` : ''}
+            </div>
+          </div>`;
+        setTimeout(() => ov.classList.remove('hidden'), 380);
+
+        this.renderHud();
+        setTimeout(() => { this.renderHud(); }, 400);
+        setTimeout(() => { ov.classList.add('hidden'); s.locked = false; onDone(); }, 1650);
+      },
+
+      /* ---- ボス戦 ---- */
+      startBoss() {
+        this.hideTimer();
+        this.s.bossHp = BOSS.hp;
+        this.setEnemy(BOSS.name, BOSS.hp, 'ボスが現れた！ 3つの欄を具体的に書くほどダメージが入る');
+        document.getElementById('enemy-hp').parentElement.lastChild.textContent = '/' + BOSS.hp;
+        Sfx.boss();
+        if (!this._bossBound) {
+          ['input-q12-target', 'input-q12-reason', 'input-q12-solution'].forEach(id =>
+            document.getElementById(id).addEventListener('input', () => this.updateBoss()));
+          this._bossBound = true;
+        }
+        this.updateBoss();
+      },
+      updateBoss() {
+        // 各欄 最大33ダメージ（目安：対象業務10字、理由・活用案40字で満点）
+        const len = id => document.getElementById(id).value.trim().length;
+        const part = (n, full) => Math.min(1, n / full) * 33.4;
+        const dmg = part(len('input-q12-target'), 10) + part(len('input-q12-reason'), 40) + part(len('input-q12-solution'), 40);
+        const hp = Math.max(1, Math.round(BOSS.hp - dmg)); // とどめは送信ボタンで
+        if (hp < this.s.bossHp) {
+          const av = document.getElementById('quest-avatar-icon');
+          av.classList.remove('fx-shake'); void av.offsetWidth; av.classList.add('fx-shake');
+        }
+        this.s.bossHp = hp;
+        document.getElementById('enemy-hp').textContent = hp;
+        document.getElementById('enemy-hp-fill').style.width = hp + '%';
+      },
+      finishBoss(onDone) {
+        const s = this.s;
+        const av = document.getElementById('quest-avatar-icon');
+        this.popDamage(`-${s.bossHp}`, '#fde68a');
+        s.bossHp = 0; s.bossDefeated = true;
+        document.getElementById('enemy-hp').textContent = 0;
+        document.getElementById('enemy-hp-fill').style.width = '0%';
+        av.classList.add('fx-defeat');
+        Sfx.critical();
+        this.gainExp(200);
+        this.renderHud();
+        const ov = document.getElementById('battle-overlay');
+        ov.innerHTML = `<div class="verdict text-center px-4">
+            <div class="font-title text-3xl sm:text-4xl font-extrabold text-amber-300">魔王撃破！</div>
+            <div class="text-sm text-slate-300 mt-1">あなたの職場の課題が、最強の武器になった</div>
+            <div class="mt-4"><span class="px-2.5 py-1 rounded-md bg-sky-500/15 border border-sky-500/40 text-sky-300 font-bold text-xs">+200 EXP</span></div>
+          </div>`;
+        setTimeout(() => ov.classList.remove('hidden'), 350);
+        setTimeout(() => { ov.classList.add('hidden'); onDone(); }, 1900);
+      },
+
+      /* ---- 結果画面 ---- */
+      titleFor() {
+        const s = this.s;
+        if (s.kills === 11 && s.revives === 0) return '称号：無傷の完全制覇者';
+        if (s.maxCombo >= 7) return '称号：連撃の覇者';
+        if (s.timeouts === 0 && s.crits >= 5) return '称号：迅雷の策士';
+        if (s.revives > 0) return '称号：不屈の冒険者';
+        return '称号：駆け出しの挑戦者';
+      },
+      renderResult() {
+        const s = this.s;
+        const stats = [
+          ['冒険Lv', this.level(), 'text-sky-300'],
+          ['総EXP', s.exp, 'text-sky-300'],
+          ['撃破', `${s.kills}/11`, 'text-amber-300'],
+          ['最大コンボ', s.maxCombo, 'text-amber-300'],
+          ['会心', s.crits, 'text-amber-300'],
+          ['残りHP', s.hp, 'text-rose-300']
+        ];
+        document.getElementById('res-battle').innerHTML = stats.map(([k, v, c]) => `
+          <div class="bg-slate-950/70 border border-slate-800 rounded-xl py-2.5">
+            <div class="font-title text-xl font-extrabold ${c}">${v}</div>
+            <div class="text-[10px] text-slate-400 mt-0.5">${k}</div>
+          </div>`).join('');
+        document.getElementById('res-battle-title').textContent = this.titleFor();
+      },
+      summaryText() {
+        const s = this.s;
+        return `冒険Lv ${this.level()} / 総EXP ${s.exp} / 撃破 ${s.kills}/11 / 最大コンボ ${s.maxCombo} / ${this.titleFor()}`;
+      }
+    };
+
+    const App = {
+      state: {
+        profile: {
+          nickname: '',
+          job: '',
+          aiExp: ''
+        },
+        currentQuestIndex: 0,
+        rawScores: {
+          knowledge: 0,
+          practical: 0,
+          discovery: 0,
+          process: 0,
+          security: 0,
+          evangelism: 0
+        },
+        quest12Data: {
+          target: '',
+          reason: '',
+          solution: ''
+        },
+        finalCharacter: null,
+        finalNormalizedScores: {},
+        finalTotalLevel: 0,
+        finalRankText: ''
+      },
+
+      init() {
+        this.renderAiExpOptions();
+      },
+
+      renderAiExpOptions() {
+        const container = document.getElementById('ai-exp-options');
+        container.innerHTML = AI_EXP_LEVELS.map(exp => `
+          <label class="relative flex flex-col p-3 rounded-xl border border-slate-700 bg-slate-950/60 hover:bg-slate-900 cursor-pointer transition-all">
+            <div class="flex items-center">
+              <input type="radio" name="ai-exp" value="${exp.id}" class="text-amber-400 focus:ring-amber-400 h-4 w-4 bg-slate-900 border-slate-700">
+              <span class="ml-2 text-sm font-bold text-white">${exp.label}</span>
+            </div>
+            <span class="text-xs text-slate-400 mt-1 pl-6">${exp.desc}</span>
+          </label>
+        `).join('');
+      },
+
+      goToProfile() {
+        this.switchScreen('screen-profile');
+      },
+
+      goToStart() {
+        this.switchScreen('screen-start');
+        document.getElementById('header-user-badge').classList.add('hidden');
+        document.getElementById('progress-container').classList.add('hidden');
+      },
+
+      submitProfile() {
+        const nickname = document.getElementById('input-nickname').value.trim();
+        const job = document.getElementById('select-job').value;
+        const selectedExp = document.querySelector('input[name="ai-exp"]:checked');
+        const errDiv = document.getElementById('profile-error');
+
+        if (!nickname) {
+          errDiv.textContent = '冒険者ネーム（ニックネーム）を入力してください。';
+          errDiv.classList.remove('hidden');
+          return;
+        }
+        if (!job) {
+          errDiv.textContent = '職種を選択してください。';
+          errDiv.classList.remove('hidden');
+          return;
+        }
+        if (!selectedExp) {
+          errDiv.textContent = '日常でのAI利用経験を選択してください。';
+          errDiv.classList.remove('hidden');
+          return;
+        }
+
+        errDiv.classList.add('hidden');
+        this.state.profile = {
+          nickname,
+          job,
+          aiExp: selectedExp.value
+        };
+
+        // Header update
+        document.getElementById('header-username').textContent = nickname;
+        document.getElementById('header-user-badge').classList.remove('hidden');
+        document.getElementById('header-user-badge').classList.add('flex');
+        document.getElementById('progress-container').classList.remove('hidden');
+
+        // Reset game state
+        this.state.currentQuestIndex = 0;
+        this.state.rawScores = { knowledge: 0, practical: 0, discovery: 0, process: 0, security: 0, evangelism: 0 };
+        ['input-q12-target', 'input-q12-reason', 'input-q12-solution'].forEach(id => document.getElementById(id).value = '');
+        Game.reset();
+        this.startQuest();
+      },
+
+      startQuest() {
+        this.switchScreen('screen-quest');
+        this.renderCurrentQuest();
+      },
+
+      renderCurrentQuest() {
+        const total = 12; // 11選択 + 1自由記述
+        const currentNum = this.state.currentQuestIndex + 1;
+        const progressPct = ((this.state.currentQuestIndex) / total) * 100;
+
+        // Update progress UI
+        document.getElementById('progress-bar').style.width = `${progressPct}%`;
+        document.getElementById('quest-number-badge').textContent = `QUEST ${String(currentNum).padStart(2, '0')}/${total}`;
+        document.getElementById('quest-remaining-count').textContent = String(total - this.state.currentQuestIndex);
+
+        if (this.state.currentQuestIndex < 11) {
+          // Standard Multiple Choice Quest (1-11)
+          const quest = QUESTS[this.state.currentQuestIndex];
+          document.getElementById('quest-tag').textContent = quest.tag;
+          document.getElementById('quest-title').textContent = `${quest.title} : ${quest.tag}`;
+          document.getElementById('quest-question').textContent = quest.question;
+          document.getElementById('quest-scenario').textContent = quest.scenario;
+          document.getElementById('quest-avatar-icon').innerHTML = `<i class="fa-solid ${quest.icon}"></i>`;
+
+          document.getElementById('quest-options').classList.remove('hidden');
+          document.getElementById('quest-freeform').classList.add('hidden');
+
+          Game.s.enemyHp = 100;
+          Game.setEnemy(ENEMIES[this.state.currentQuestIndex].name, 100, 'が現れた！ 時間内に行動を選ぼう');
+          document.getElementById('enemy-hint').textContent = `${ENEMIES[this.state.currentQuestIndex].name}が現れた！ 時間内に行動を選ぼう`;
+          document.getElementById('enemy-hp').parentElement.lastChild.textContent = '/100';
+
+          const optionsContainer = document.getElementById('quest-options');
+          optionsContainer.innerHTML = quest.options.map((opt, idx) => `
+            <button onclick="App.chooseOption(${idx})" class="w-full text-left p-4 rounded-xl border border-slate-700/80 bg-slate-950/70 hover:bg-slate-800/90 hover:border-amber-400/80 transition-all flex items-start group">
+              <span class="w-7 h-7 rounded-lg bg-slate-900 border border-slate-700 text-xs font-mono font-bold flex items-center justify-center text-amber-400 group-hover:border-amber-400 mr-3 flex-shrink-0 mt-0.5">
+                ${['A', 'B', 'C', 'D'][idx]}
+              </span>
+              <span class="text-sm text-slate-200 group-hover:text-white leading-relaxed">
+                ${opt.text}
+              </span>
+            </button>
+          `).join('');
+          Game.startTimer();
+        } else {
+          // QUEST 12: Final Boss (Free form input)
+          document.getElementById('quest-tag').textContent = '自社業務AI化の試練';
+          document.getElementById('quest-title').textContent = 'QUEST 12 : ラスボス';
+          document.getElementById('quest-question').textContent = '自社の仕事をAIで変革するシナリオを描け';
+          document.getElementById('quest-scenario').textContent = '最後の門番が問いかける。「そなたの職場にある真の課題は何だ？ AIという魔法をどの現場に宿すのか？」';
+          document.getElementById('quest-avatar-icon').innerHTML = `<i class="fa-solid fa-crown text-amber-400"></i>`;
+
+          document.getElementById('quest-options').classList.add('hidden');
+          document.getElementById('quest-freeform').classList.remove('hidden');
+          Game.startBoss();
+        }
+      },
+
+      chooseOption(optionIndex) {
+        if (Game.s.locked) return;
+        const quest = QUESTS[this.state.currentQuestIndex];
+        const selected = quest.options[optionIndex];
+
+        // Add scores（診断ロジックは従来どおり）
+        for (const [key, value] of Object.entries(selected.scores)) {
+          this.state.rawScores[key] = (this.state.rawScores[key] || 0) + value;
+        }
+
+        // 選択肢をロックしてバトル演出 → 次の問題へ
+        document.querySelectorAll('#quest-options button').forEach((b, i) => {
+          b.classList.add('opt-locked');
+          if (i === optionIndex) b.classList.add('opt-picked');
+        });
+        Game.attack(quest, selected, () => {
+          this.state.currentQuestIndex++;
+          this.renderCurrentQuest();
+        });
+      },
+
+      submitQuest12() {
+        const target = document.getElementById('input-q12-target').value.trim();
+        const reason = document.getElementById('input-q12-reason').value.trim();
+        const solution = document.getElementById('input-q12-solution').value.trim();
+        const errDiv = document.getElementById('freeform-error');
+
+        if (!target || !reason || !solution) {
+          errDiv.classList.remove('hidden');
+          return;
+        }
+        errDiv.classList.add('hidden');
+
+        this.state.quest12Data = { target, reason, solution };
+
+        // Quest 12 description provides extra comprehensive points
+        this.state.rawScores.problemDiscovery = (this.state.rawScores.discovery || 0) + 4;
+        this.state.rawScores.process = (this.state.rawScores.process || 0) + 4;
+        this.state.rawScores.practical = (this.state.rawScores.practical || 0) + 3;
+
+        if (Game.s.locked) return;
+        Game.s.locked = true;
+        Game.finishBoss(() => { Game.s.locked = false; this.startSummoningSequence(); });
+      },
+
+      startSummoningSequence() {
+        this.switchScreen('screen-loading');
+        document.getElementById('progress-bar').style.width = '100%';
+
+        const statusText = document.getElementById('loading-status-text');
+        const messages = [
+          '回答データをAIコアへ融合中...',
+          '6つの能力パラメータを抽出中...',
+          '最適なジョブクラスを召喚中...'
+        ];
+
+        let step = 0;
+        const interval = setInterval(() => {
+          step++;
+          if (step < messages.length) {
+            statusText.textContent = messages[step];
+          } else {
+            clearInterval(interval);
+            App.calculateAndShowResult();
+          }
+        }, 700);
+      },
+
+      calculateAndShowResult() {
+        // Maximum possible raw score per category across 11 questions is roughly 55
+        const maxRawPossible = 50; 
+
+        // Normalize 6 abilities to 0-100 scale
+        const normalizedScores = {};
+        let totalSum = 0;
+
+        ABILITIES.forEach(ab => {
+          const raw = this.state.rawScores[ab.key] || 0;
+          // Scale raw score to 0-100 range and clamp
+          let score = Math.round((raw / maxRawPossible) * 100);
+          score = Math.min(100, Math.max(10, score)); // Min 10 for friendly RPG experience
+          normalizedScores[ab.key] = score;
+          totalSum += score;
+        });
+
+        // Calculate overall average level (0-100)
+        const overallLevel = Math.round(totalSum / ABILITIES.length);
+
+        // Determine Level Rank text using configurable thresholds
+        let rankText = '初級';
+        let badgeClass = 'bg-sky-500/20 text-sky-300 border-sky-500/40';
+        if (overallLevel > LEVEL_THRESHOLDS.INTERMEDIATE_MAX) {
+          rankText = '上級マスタークラス';
+          badgeClass = 'bg-amber-500/20 text-amber-300 border-amber-500/40';
+        } else if (overallLevel > LEVEL_THRESHOLDS.BEGINNER_MAX) {
+          rankText = '中級クラス';
+          badgeClass = 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40';
+        } else {
+          rankText = '初級ビギナークラス';
+        }
+
+        // Evaluate character (Rule-based engine with extensible architecture)
+        const character = evaluateCharacter(normalizedScores, this.state.profile);
+
+        this.state.finalCharacter = character;
+        this.state.finalNormalizedScores = normalizedScores;
+        this.state.finalTotalLevel = overallLevel;
+        this.state.finalRankText = rankText;
+
+        // Render to UI
+        document.getElementById('res-user-name').textContent = this.state.profile.nickname;
+        document.getElementById('res-badge-level').textContent = rankText;
+        document.getElementById('res-badge-level').className = `px-2.5 py-0.5 rounded-full text-xs font-bold border ${badgeClass}`;
+
+        document.getElementById('res-char-avatar').textContent = character.avatar;
+        document.getElementById('res-level-num').textContent = overallLevel;
+        document.getElementById('res-char-name').textContent = character.name;
+        document.getElementById('res-catchphrase').textContent = character.catchphrase;
+        document.getElementById('res-description').textContent = character.description;
+        document.getElementById('res-strength').textContent = character.strength;
+        document.getElementById('res-growth').textContent = character.growth;
+
+        // Render 6 Ability bars & stars
+        const abilitiesContainer = document.getElementById('res-abilities-container');
+        abilitiesContainer.innerHTML = ABILITIES.map(ab => {
+          const val = normalizedScores[ab.key];
+          // Calculate 5-star rating (each star = 20 points)
+          const starCount = Math.min(5, Math.max(1, Math.round(val / 20)));
+          const starsHtml = '★'.repeat(starCount) + '☆'.repeat(5 - starCount);
+
+          return `
+            <div class="bg-slate-950/70 border border-slate-800/80 p-3 rounded-xl">
+              <div class="flex items-center justify-between text-xs mb-1">
+                <span class="font-bold text-slate-300 flex items-center gap-1.5">
+                  <i class="fa-solid ${ab.icon} ${ab.color}"></i> ${ab.name}
+                </span>
+                <div class="flex items-center gap-2">
+                  <span class="text-amber-400 font-mono tracking-tighter text-xs">${starsHtml}</span>
+                  <span class="text-white font-mono font-bold w-7 text-right">${val}</span>
+                </div>
+              </div>
+              <div class="w-full bg-slate-900 h-2 rounded-full overflow-hidden">
+                <div class="bg-gradient-to-r from-sky-500 to-amber-400 h-full rounded-full transition-all duration-1000" style="width: ${val}%"></div>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        // NEXT QUESTS
+        const questsContainer = document.getElementById('res-next-quests');
+        questsContainer.innerHTML = character.nextQuests.map((q, idx) => `
+          <div class="flex items-start gap-3 p-2.5 rounded-lg bg-slate-900/60 border border-slate-800">
+            <span class="w-5 h-5 rounded bg-sky-500/20 text-sky-400 text-xs font-mono font-bold flex items-center justify-center flex-shrink-0 mt-0.5">
+              ${idx + 1}
+            </span>
+            <span class="text-xs sm:text-sm text-slate-200 font-medium">${q}</span>
+          </div>
+        `).join('');
+
+        // Recommended Training
+        document.getElementById('res-training-title').textContent = character.trainingTitle;
+        document.getElementById('res-training-desc').textContent = character.trainingDesc;
+
+        // Battle record
+        Game.renderResult();
+
+        // QUEST 12 input display
+        document.getElementById('res-theme-target').textContent = this.state.quest12Data.target || '未記入';
+        document.getElementById('res-theme-reason').textContent = this.state.quest12Data.reason || '未記入';
+        document.getElementById('res-theme-solution').textContent = this.state.quest12Data.solution || '未記入';
+
+        this.switchScreen('screen-result');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      },
+
+      copyResultToClipboard() {
+        const c = this.state.finalCharacter;
+        const p = this.state.profile;
+        const s = this.state.finalNormalizedScores;
+
+        let starsText = '';
+        ABILITIES.forEach(ab => {
+          const val = s[ab.key];
+          const starCount = Math.min(5, Math.max(1, Math.round(val / 20)));
+          starsText += `${ab.name.padEnd(6, '　')} ${'★'.repeat(starCount)}${'☆'.repeat(5 - starCount)} (${val}pt)\n`;
+        });
+
+        const textToCopy = `
+⚔️ AI QUEST 診断結果
+━━━━━━━━━━━━━━━━━━━━━━━━
+【冒険者】${p.nickname}（職種: ${p.job}）
+【クラス】${c.avatar} ${c.name}
+【LEVEL】${this.state.finalTotalLevel} / 100（${this.state.finalRankText}）
+【モットー】${c.catchphrase}
+
+■ 6つのAI能力値
+${starsText}
+■ NEXT QUEST
+${c.nextQuests.map((q, i) => `${i + 1}. ${q}`).join('\n')}
+
+■ バトル戦績
+${Game.summaryText()}
+
+■ 自社でAI化したい業務テーマ
+・対象業務: ${this.state.quest12Data.target}
+・変えたい理由: ${this.state.quest12Data.reason}
+・AI活用案: ${this.state.quest12Data.solution}
+
+#AIQUEST #AI人材診断
+━━━━━━━━━━━━━━━━━━━━━━━━
+`.trim();
+
+        // Safe fallback copy
+        const tempTextarea = document.createElement('textarea');
+        tempTextarea.value = textToCopy;
+        document.body.appendChild(tempTextarea);
+        tempTextarea.select();
+        try {
+          document.execCommand('copy');
+          this.showToast('結果テキストをクリップボードにコピーしました！');
+        } catch (err) {
+          this.showToast('コピーに失敗しました。手動で選択してください。');
+        }
+        document.body.removeChild(tempTextarea);
+      },
+
+      showToast(msg) {
+        const toast = document.getElementById('toast');
+        document.getElementById('toast-message').textContent = msg;
+        toast.classList.remove('hidden');
+        setTimeout(() => {
+          toast.classList.add('hidden');
+        }, 3000);
+      },
+
+      restartQuiz() {
+        Game.stopTimer();
+        this.goToStart();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      },
+
+      switchScreen(screenId) {
+        const screens = ['screen-start', 'screen-profile', 'screen-quest', 'screen-loading', 'screen-result'];
+        screens.forEach(id => {
+          const el = document.getElementById(id);
+          if (id === screenId) {
+            el.classList.remove('hidden');
+          } else {
+            el.classList.add('hidden');
+          }
+        });
+      }
+    };
+
+    // Initialize on load
+    window.addEventListener('DOMContentLoaded', () => {
+      App.init();
+    });
+  </script>
+</body>
+</html>
