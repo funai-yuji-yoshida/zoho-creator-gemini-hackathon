@@ -1,0 +1,614 @@
+<!doctype html>
+<html lang="ja"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>最終審査ボード｜Gemini × Zoho Creator AIハッカソン</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏆</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style id="css">
+:root{
+  --bg:#EEF0F7;--surface:#FFFFFF;--ink:#141A33;--muted:#5B6382;--line:#D5D9E8;--soft:#E4E7F2;
+  --c1:#D9780F;--c2:#0F8A80;--c3:#9E3CAE;--focus:#3557E6;--danger:#C2312F;
+  --display:"Shippori Mincho B1","Hiragino Mincho ProN","Yu Mincho","YuMincho",serif;
+  --body:"Shippori Mincho B1","Hiragino Mincho ProN","Yu Mincho","YuMincho",serif;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0E1330;--surface:#161C40;--ink:#F1F2FA;--muted:#9AA1C7;--line:#2A3163;--soft:#1F2650;
+  --c1:#F5A83A;--c2:#2FC2B2;--c3:#D06BDD;--focus:#8FA6FF;--danger:#FF6B66;}}
+:root[data-theme="dark"]{--bg:#0E1330;--surface:#161C40;--ink:#F1F2FA;--muted:#9AA1C7;--line:#2A3163;--soft:#1F2650;
+  --c1:#F5A83A;--c2:#2FC2B2;--c3:#D06BDD;--focus:#8FA6FF;--danger:#FF6B66;}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+body.staging{overflow:hidden}
+.top h1,.rank,.score b,.detail .v,.scale button,.st-title,.st-rank,.st-total,.drum,.st-bar .v,.st-list b,.st-team{font-weight:800}
+.st-title{letter-spacing:.08em}
+body{line-height:1.75}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.wrap{max-width:1080px;margin:0 auto;padding:24px 20px 64px}
+
+/* header */
+.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px 24px;padding-bottom:18px;border-bottom:2px solid var(--ink)}
+.top h1{font-family:var(--display);font-weight:800;font-size:clamp(22px,3.4vw,34px);line-height:1.25;margin:0;letter-spacing:.01em}
+.top p{margin:4px 0 0;color:var(--muted);font-size:14px}
+.tabs{display:flex;gap:4px;margin-top:18px;flex-wrap:wrap}
+.tab{border:0;background:transparent;padding:8px 16px;border-radius:999px;font-weight:700;color:var(--muted)}
+.tab[aria-current="true"]{background:var(--ink);color:var(--bg)}
+.btn{border:2px solid var(--ink);background:transparent;border-radius:10px;padding:9px 16px;font-weight:700}
+.btn.primary{background:var(--ink);color:var(--bg)}
+.btn.stagebtn{background:var(--ink);color:var(--bg);font-family:var(--display);font-weight:800;font-size:17px;padding:12px 22px;border-radius:14px}
+.btn.danger{border-color:var(--danger);color:var(--danger)}
+.btn.danger.primary{background:var(--danger);color:#fff}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.note{color:var(--muted);font-size:14px}
+
+/* legend */
+.legend{display:flex;flex-wrap:wrap;gap:8px 22px;margin:22px 0 8px;font-size:14px}
+.legend span{display:inline-flex;align-items:center;gap:8px;font-weight:700}
+.sw{width:14px;height:14px;border-radius:4px;display:inline-block;flex:none}
+.progress{display:flex;align-items:center;gap:12px;font-size:14px;color:var(--muted);margin:0 0 18px}
+.progress .track{flex:1;max-width:240px;height:6px;border-radius:9px;background:var(--soft);overflow:hidden}
+.progress .track i{display:block;height:100%;background:var(--ink)}
+
+/* leaderboard */
+.board{list-style:none;margin:0;padding:0}
+.row{display:grid;grid-template-columns:72px minmax(160px,1.1fr) 2fr 96px;align-items:center;gap:8px 18px;padding:16px 4px;border-bottom:1px solid var(--line);cursor:pointer}
+.row:hover{background:var(--soft)}
+.rank{font-family:var(--display);font-size:34px;line-height:1;text-align:center}
+.row.r1 .rank{font-size:46px;color:var(--c1)}
+.who b{display:block;font-size:18px;line-height:1.35}
+.who span{display:block;font-size:13px;color:var(--muted)}
+.bar{display:flex;height:22px;border-radius:6px;background:var(--soft);overflow:hidden}
+.bar i{display:block;height:100%;transition:width .9s cubic-bezier(.2,.8,.2,1)}
+.score{text-align:right;white-space:nowrap}
+.score b{font-family:var(--display);font-weight:800;font-size:30px}
+.score span{font-size:13px;color:var(--muted);margin-left:2px}
+.cnt{grid-column:2/-1;font-size:12px;color:var(--muted);margin-top:-6px}
+.detail{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,1fr);gap:16px;padding:6px 0 4px 90px}
+.detail .k{font-size:13px;font-weight:700;display:flex;gap:6px;align-items:center}
+.detail .v{font-family:var(--display);font-size:24px}
+.comments{grid-column:1/-1;padding-left:90px;margin:0;list-style:none}
+.radar{display:block;overflow:visible}
+.radar .ring{fill:none}
+.radar text{font-family:var(--body);font-weight:700}
+.radar .shape{transform-box:view-box;transform-origin:center;transition:transform 1.2s cubic-bezier(.2,.8,.2,1)}
+.detail-wrap{grid-column:1/-1;display:flex;align-items:center;gap:28px;padding:6px 0 4px 90px;flex-wrap:wrap}
+.detail-wrap .detail{padding:0;flex:1;min-width:260px}
+.compare{margin-top:40px;border-top:2px solid var(--ink);display:grid;grid-template-columns:minmax(260px,380px) 1fr;gap:12px 40px;align-items:center}
+.compare h2{grid-column:1/-1;font-family:var(--display);font-weight:800;font-size:22px;margin:18px 0 0}
+.compare ul{list-style:none;margin:0;padding:0}
+.compare li{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
+.compare li svg{flex:none}
+.compare li b{font-family:var(--display);font-weight:800;font-size:20px;min-width:2.4em}
+.compare li small{color:var(--muted);margin-left:auto;white-space:nowrap}
+.st-body{display:flex;align-items:center;justify-content:center;gap:4vw;width:min(1100px,100%);margin-top:28px}
+.st-body .st-bars{margin:0;flex:1;max-width:620px}
+.comments li{font-size:14px;padding:8px 12px;border-left:3px solid var(--line);margin:6px 0;background:var(--surface)}
+
+.awards{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:40px;border-top:2px solid var(--ink)}
+.awards h2{grid-column:1/-1;font-family:var(--display);font-weight:800;font-size:22px;margin:18px 0 6px}
+.award{padding:14px 18px 16px 0}
+.award+.award{padding-left:18px;border-left:1px solid var(--line)}
+.award .k{font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px}
+.award b{display:block;font-size:19px;margin-top:6px}
+.award small{color:var(--muted)}
+
+.empty{padding:48px 0;max-width:560px}
+.empty h2{font-family:var(--display);font-weight:800;font-size:24px;margin:0 0 8px}
+
+/* judge sheets */
+.judges{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 6px}
+.chip{border:2px solid var(--line);background:var(--surface);border-radius:999px;padding:8px 18px;font-weight:700}
+.chip[aria-pressed="true"]{border-color:var(--ink);background:var(--ink);color:var(--bg)}
+.sheet{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px 22px;margin:18px 0}
+.sheet header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:10px}
+.sheet h3{margin:0;font-size:20px}
+.sheet header p{margin:2px 0 0;color:var(--muted);font-size:14px}
+.status{font-size:13px;font-weight:700;padding:4px 10px;border-radius:999px;background:var(--soft);white-space:nowrap}
+.status.ok{background:var(--c2);color:#fff}
+.status.dirty{background:var(--c1);color:#fff}
+.crit{padding:12px 0;border-top:1px solid var(--line)}
+.crit-h{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;margin-bottom:8px}
+.crit-h b{font-size:16px}
+.crit-h small{color:var(--muted);font-size:13px}
+.scale{display:grid;grid-template-columns:repeat(10,1fr);gap:6px}
+.scale button{border:2px solid var(--line);background:transparent;border-radius:10px;padding:10px 0;font-family:var(--display);font-size:17px;min-height:46px}
+.scale button[aria-pressed="true"]{color:#fff;border-color:transparent}
+.scale-ends{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:4px}
+textarea{width:100%;min-height:72px;border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--bg);resize:vertical;margin:12px 0}
+.sheet .act{display:flex;justify-content:flex-end}
+
+/* settings */
+.set{display:grid;grid-template-columns:220px 1fr;gap:12px 32px;padding:24px 0;border-bottom:1px solid var(--line)}
+.set h2{font-size:17px;margin:0}
+.set h2+p{margin:4px 0 0;font-size:13px;color:var(--muted)}
+.field{display:flex;flex-wrap:wrap;gap:8px}
+.field input[type=text]{flex:1;min-width:160px;border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--surface)}
+.list{list-style:none;margin:12px 0 0;padding:0}
+.list li{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px dashed var(--line)}
+.list li span{flex:1}
+.list li small{color:var(--muted);margin-left:8px}
+.x{border:0;background:transparent;color:var(--muted);font-size:20px;line-height:1;padding:4px 8px;border-radius:6px}
+.x:hover{color:var(--danger)}
+.toggle{display:flex;align-items:center;gap:10px;font-weight:700}
+.toggle input{width:20px;height:20px;accent-color:var(--ink)}
+
+.banner{background:var(--soft);border-radius:10px;padding:10px 14px;font-size:14px;margin-top:16px}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:10px;font-weight:700;font-size:14px;z-index:50;max-width:90vw}
+
+/* login & header */
+.who-am-i{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.me{font-size:14px;font-weight:700}
+.btn.small{padding:5px 12px;font-size:13px;border-width:1.5px;border-radius:8px}
+.login{max-width:640px;margin-top:28px}
+.login h2{font-family:var(--display);font-weight:800;font-size:24px;margin:0 0 6px}
+.field input[type=password]{flex:1;min-width:160px;border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--surface);letter-spacing:.2em}
+.list li .btn.small{flex:none}
+
+/* report */
+.rep-actions{display:flex;flex-wrap:wrap;gap:8px;margin:22px 0 4px}
+.report h2.rh{font-family:var(--display);font-weight:800;font-size:22px;margin:36px 0 12px;padding-bottom:6px;border-bottom:2px solid var(--ink)}
+.report .rhead{margin-top:24px}
+.report .rhead h1{font-family:var(--display);font-weight:800;font-size:30px;margin:0;line-height:1.3}
+.report .rhead p{margin:6px 0 0;color:var(--muted);font-size:14px}
+.rsum{display:flex;flex-wrap:wrap;gap:8px 32px;margin-top:14px;font-size:15px}
+.rsum b{font-family:var(--display);font-size:22px;margin-left:6px}
+.tblw{overflow-x:auto}
+.rtable{width:100%;border-collapse:collapse;font-size:14px;min-width:560px}
+.rtable th,.rtable td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+.rtable th{font-size:13px;color:var(--muted);font-weight:700;border-bottom:1.5px solid var(--ink)}
+.rtable .n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.rtable tr.tot td{font-weight:800}
+.rteam{break-inside:avoid;page-break-inside:avoid;padding:18px 0;border-bottom:1px solid var(--line)}
+.rteam-h{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.rteam-h .rk{font-family:var(--display);font-weight:800;font-size:28px}
+.rteam-h h3{margin:0;font-size:20px}
+.rteam-h span{color:var(--muted);font-size:14px}
+.rteam-h .pt{color:var(--ink);margin-left:auto;font-family:var(--display);font-weight:800;font-size:24px}
+.rteam-b{display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap;margin-top:8px}
+.rteam-b .tblw{flex:1;min-width:280px}
+.rcom{list-style:none;padding:0;margin:10px 0 0}
+.rcom li{font-size:14px;padding:6px 0 6px 12px;border-left:3px solid var(--line);margin:6px 0}
+.rcom li b{margin-right:8px}
+.rcrit dt{font-weight:800;margin-top:12px;display:flex;gap:8px;align-items:center}
+.rcrit dd{margin:4px 0 0 22px;font-size:14px;color:var(--muted)}
+@media print{
+  html:root:not([data-print]){--bg:#fff;--surface:#fff;--ink:#111;--muted:#555;--line:#ccc;--soft:#eee;--c1:#D9780F;--c2:#0F8A80;--c3:#9E3CAE}
+  .tabs,.stagebtn,.who-am-i,.rep-actions,.toast,#stage,#confetti{display:none!important}
+  .top{border-bottom:0}.top p{display:none}
+  .wrap{max-width:none;padding:0}
+  .rtable{min-width:0}
+  .report h2.rh{break-after:avoid}
+}
+
+/* ===== stage (always dark) ===== */
+#stage{position:fixed;inset:0;z-index:40;background:radial-gradient(ellipse at 50% 120%,#2A2470 0%,#0B0F2A 62%);color:#F4F5FF;display:flex;flex-direction:column;padding:calc(env(safe-area-inset-top,0px) + 28px) 5vw calc(env(safe-area-inset-bottom,0px) + 22px);overflow:hidden;outline:none}
+#stage[hidden]{display:none}
+.st-main{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;min-height:0}
+.st-ev{font-size:clamp(14px,1.6vw,20px);opacity:.75;margin:0 0 12px}
+.st-title{font-family:var(--display);font-size:clamp(40px,7vw,96px);line-height:1.1;margin:0}
+.st-crit{display:flex;gap:28px;justify-content:center;margin-top:36px;flex-wrap:wrap;font-size:clamp(14px,1.6vw,20px);font-weight:700}
+.st-crit span{display:inline-flex;gap:10px;align-items:center}
+.st-rank{font-family:var(--display);font-size:clamp(28px,4vw,52px);line-height:1}
+.st-rank em{font-style:normal;font-size:2.4em;margin:0 .06em}
+.st-team{font-size:clamp(30px,5vw,68px);font-weight:900;line-height:1.2;margin:18px 0 4px}
+.st-prod{font-size:clamp(15px,1.8vw,22px);opacity:.75;margin:0}
+.st-bars{width:min(860px,100%);margin:34px auto 0;display:grid;gap:14px}
+.st-bar{display:grid;grid-template-columns:minmax(120px,190px) 1fr 64px;align-items:center;gap:16px;text-align:left;font-weight:700;font-size:clamp(13px,1.5vw,18px)}
+.st-bar .tr{height:20px;border-radius:10px;background:rgba(255,255,255,.12);overflow:hidden}
+.st-bar .tr i{display:block;height:100%;width:0;border-radius:10px;transition:width 1.2s cubic-bezier(.2,.8,.2,1)}
+.st-bar .v{font-family:var(--display);font-size:1.3em;text-align:right}
+.st-total{font-family:var(--display);font-size:clamp(48px,7.5vw,108px);line-height:1;margin-top:16px}
+.st-total small{font-size:.28em;margin-left:.2em;opacity:.8}
+.top1 .st-rank,.top1 .st-total{color:#FFC75A;text-shadow:0 0 40px rgba(255,199,90,.45)}
+.drum{font-family:var(--display);font-size:clamp(48px,8vw,110px);animation:pulse 1.1s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.35;transform:scale(.97)}}
+.st-awards{display:grid;grid-template-columns:repeat(3,1fr);gap:4vw;width:min(1100px,100%);margin-top:40px;text-align:left}
+.st-awards .k{font-weight:700;display:flex;gap:10px;align-items:center;font-size:clamp(13px,1.5vw,18px)}
+.st-awards b{display:block;font-size:clamp(20px,2.6vw,34px);margin-top:10px;line-height:1.25}
+.st-awards small{opacity:.7;font-size:clamp(13px,1.3vw,16px)}
+.st-foot{display:flex;justify-content:space-between;align-items:center;gap:16px;font-size:13px;opacity:.7}
+.st-list{display:flex;gap:18px;flex-wrap:wrap;justify-content:center;margin-top:30px;font-size:14px;opacity:.75}
+.st-list b{font-family:var(--display);font-weight:800;margin-right:6px}
+.st-close{background:transparent;border:1px solid rgba(255,255,255,.4);color:#fff;border-radius:8px;padding:6px 12px}
+.st-in{animation:stin .7s cubic-bezier(.2,.8,.2,1) both}
+@keyframes stin{from{opacity:0;transform:translateY(24px)}}
+#confetti{position:fixed;inset:0;z-index:45;pointer-events:none;width:100%;height:100%}
+
+@media (max-width:760px){
+  .row{grid-template-columns:52px 1fr 76px;padding:14px 0}
+  .rank{font-size:26px}.row.r1 .rank{font-size:34px}
+  .bar{grid-column:2/-1;grid-row:2}
+  .score{grid-column:3;grid-row:1}.score b{font-size:24px}
+  .cnt{grid-column:2/-1;margin:0}
+  .detail{padding-left:0;grid-template-columns:1fr 1fr 1fr}
+  .comments{padding-left:0}
+  .awards{grid-template-columns:1fr}
+  .award+.award{padding-left:0;border-left:0;border-top:1px solid var(--line)}
+  .set{grid-template-columns:1fr}
+  .scale{grid-template-columns:repeat(5,1fr)}
+  .st-awards{grid-template-columns:1fr;gap:20px}
+  .st-bar{grid-template-columns:96px 1fr 48px;gap:10px}
+  .detail-wrap,.comments{padding-left:0}
+  .compare{grid-template-columns:1fr}
+  .compare .radar{width:100%;max-width:320px;height:auto}
+  .st-body{flex-direction:column;gap:18px}.st-body .radar{width:200px;height:auto}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head><body>
+<div id="app"><div class="wrap"><p class="note">読み込み中…</p></div></div>
+<div id="stage" hidden tabindex="-1"></div>
+<canvas id="confetti" aria-hidden="true"></canvas>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="config.js"></script>
+<script>
+(function(){
+"use strict";
+var CFG=window.BOARD_CONFIG||{};
+var CRIT=[
+ {k:'impact',name:'ビジネスインパクト',short:'インパクト',col:'var(--c1)',sc:'#F5A83A',q:'現場の経営課題をどれだけ根本から解決できるか',hint:'売上向上・コスト削減・時間短縮など定量効果／人手不足・集客難・制度対応などリアルなペインへの刺さり'},
+ {k:'tech',name:'技術的完成度',short:'技術',col:'var(--c2)',sc:'#2FC2B2',q:'AIのポテンシャルを生かし、機能するプロダクトか',hint:'プロトタイプとしてスムーズに動作するか／生成・予測・推論などAIの特性をビジネスロジックに落とし込めているか'},
+ {k:'ux',name:'斬新性とUX',short:'斬新性・UX',col:'var(--c3)',sc:'#D06BDD',q:'既存ツールの延長にない驚きと、迷わず使える体験があるか',hint:'業界の常識を覆す切り口・新しい価値提案／ITが得意でない現場スタッフでも直観的に使えるか'}
+];
+var S={config:{title:'',teams:[],judges:[],open:true},scores:{},mode:'loading',err:'',role:null,judgeId:null,pin:null,tab:'results',drafts:{},expanded:null,loginRole:'judge',loginJudge:null,busy:false};
+var sb=null, app=document.getElementById('app'), stage=document.getElementById('stage');
+
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function fmt(n){return (Math.round(n*10)/10).toFixed(1)}
+var toastT;function toast(m){var t=document.querySelector('.toast');if(!t){t=document.createElement('div');t.className='toast';t.setAttribute('role','status');document.body.appendChild(t)}t.textContent=m;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(function(){t.hidden=true},3000)}
+function ss(k,v){try{if(v===undefined)return sessionStorage.getItem(k);if(v===null)sessionStorage.removeItem(k);else sessionStorage.setItem(k,v)}catch(e){return null}}
+function writable(){return S.role==='admin'||S.role==='judge'}
+function isAdmin(){return S.role==='admin'}
+function judgeName(id){var j=S.config.judges.find(function(x){return x.id===id});return j?j.name:''}
+/* ---------- scoring math ---------- */
+function compute(){
+  var c=S.config, jset={};c.judges.forEach(function(j){jset[j.id]=1});
+  var all=Object.keys(S.scores).map(function(k){return S.scores[k]});
+  var rows=c.teams.map(function(t){
+    var ss=all.filter(function(s){return s&&s.teamId===t.id&&jset[s.judgeId]});
+    var avg={},sum=0;CRIT.forEach(function(cr){avg[cr.k]=ss.length?ss.reduce(function(a,s){return a+(+s[cr.k]||0)},0)/ss.length:0;sum+=avg[cr.k]});
+    return {team:t,n:ss.length,avg:avg,sum:sum,pts:sum/30*100,comments:ss.filter(function(s){return s.comment}).map(function(s){return s.comment})};
+  });
+  rows.sort(function(a,b){return (b.n>0)-(a.n>0)||b.pts-a.pts||a.team.name.localeCompare(b.team.name,'ja')});
+  var prev=null,rank=0;rows.forEach(function(r,i){if(!r.n){r.rank=null;return}var p=fmt(r.pts);if(p!==prev){rank=i+1;prev=p}r.rank=rank});
+  return rows;
+}
+function doneCount(){var c=S.config,n=0,j={},t={};c.judges.forEach(function(x){j[x.id]=1});c.teams.forEach(function(x){t[x.id]=1});Object.keys(S.scores).forEach(function(k){var s=S.scores[k];if(s&&j[s.judgeId]&&t[s.teamId])n++});return n}
+function radar(series,o){
+  o=o||{};var size=o.size||220,lab=o.labels!==false,pad=lab?44:6,cxp=size/2,cyp=size/2+(lab?8:0),R=size/2-pad;
+  var ang=CRIT.map(function(_,i){return (-90+i*120)*Math.PI/180});
+  function pt(i,v){return [cxp+Math.cos(ang[i])*R*v/10,cyp+Math.sin(ang[i])*R*v/10]}
+  var gs=o.grid||'var(--line)',h='<svg class="radar" width="'+size+'" height="'+size+'" viewBox="0 0 '+size+' '+size+'" role="img" aria-label="'+esc(o.label||'レーダーチャート')+'">';
+  [2,4,6,8,10].forEach(function(r){h+='<polygon class="ring" stroke="'+gs+'" points="'+CRIT.map(function(_,i){return pt(i,r).join(',')}).join(' ')+'"/>'});
+  CRIT.forEach(function(c,i){var e=pt(i,10);h+='<line stroke="'+gs+'" x1="'+cxp+'" y1="'+cyp+'" x2="'+e[0]+'" y2="'+e[1]+'"/>'});
+  series.forEach(function(sr){
+    var pts=CRIT.map(function(c,i){return pt(i,sr.avg[c.k]).join(',')}).join(' ');
+    h+='<g class="shape"'+(o.grow?' style="transform:scale(0)"':'')+'><polygon points="'+pts+'" fill="'+(sr.fill||'none')+'" fill-opacity="'+(sr.fo||.18)+'" stroke="'+sr.stroke+'" stroke-width="'+(sr.sw||2.5)+'"'+(sr.dash?' stroke-dasharray="'+sr.dash+'"':'')+' stroke-linejoin="round"/>';
+    if(sr.dots)CRIT.forEach(function(c,i){var q=pt(i,sr.avg[c.k]);h+='<circle cx="'+q[0]+'" cy="'+q[1]+'" r="'+(size/45)+'" fill="'+(o.dark?c.sc:c.col)+'"/>'});
+    h+='</g>';
+  });
+  if(lab)CRIT.forEach(function(c,i){var e=pt(i,10),x=e[0],y=e[1],an='middle';
+    if(i===0)y-=10;else{y+=20;an=i===1?'end':'start';x+=i===1?14:-14}
+    h+='<text x="'+x+'" y="'+y+'" text-anchor="'+an+'" font-size="'+Math.max(11,Math.round(size/18))+'" fill="'+(o.dark?c.sc:c.col)+'">'+c.short+'</text>'});
+  return h+'</svg>';
+}
+function bestBy(rows,k){var r=rows.filter(function(x){return x.n});if(!r.length)return null;return r.slice().sort(function(a,b){return b.avg[k]-a.avg[k]})[0]}
+
+function legend(){return '<div class="legend">'+CRIT.map(function(c){return '<span><i class="sw" style="background:'+c.col+'"></i>'+c.name+'（10点）</span>'}).join('')+'<span style="color:var(--muted);font-weight:500">合計を100点に換算・審査員平均</span></div>'}
+
+function vResults(){
+  var c=S.config,rows=compute();
+  if(!c.teams.length) return '<div class="empty"><h2>参加チームが未登録です</h2><p>'+(writable()?'「チームと審査員」タブでチームと審査員を登録すると、ここにランキングが表示されます。':'審査の準備中です。')+'</p></div>';
+  var total=c.teams.length*c.judges.length, done=doneCount();
+  var prog='<div class="progress"><span>採点状況 '+done+' / '+total+'</span><span class="track"><i style="width:'+(total?done/total*100:0)+'%"></i></span></div>';
+  if(!c.open&&!writable()) return '<div class="empty"><h2>ただいま審査中</h2><p>結果は発表後にここへ表示されます。</p>'+prog+'</div>';
+  var h=(!c.open?'<p class="banner">参加者には結果を非表示にしています（主催者・審査員のみ表示中）。</p>':'')+legend()+prog+'<ol class="board">';
+  rows.forEach(function(r){
+    var open=S.expanded===r.team.id;
+    h+='<li class="row'+(r.rank===1?' r1':'')+'" data-act="expand" data-id="'+esc(r.team.id)+'" tabindex="0" aria-expanded="'+open+'">'+
+      '<div class="rank">'+(r.rank||'–')+'</div><div class="who"><b>'+esc(r.team.name)+'</b><span>'+esc(r.team.product||'')+'</span></div>'+
+      '<div class="bar" role="img" aria-label="'+CRIT.map(function(cr){return cr.name+' '+fmt(r.avg[cr.k])}).join('、')+'">'+CRIT.map(function(cr){return '<i style="width:'+(r.avg[cr.k]/30*100)+'%;background:'+cr.col+'"></i>'}).join('')+'</div>'+
+      '<div class="score">'+(r.n?'<b>'+fmt(r.pts)+'</b><span>点</span>':'<span>未採点</span>')+'</div>'+
+      '<div class="cnt">審査 '+r.n+' / '+c.judges.length+' 名</div>';
+    if(open){
+      h+='<div class="detail-wrap">'+(r.n?radar([{avg:r.avg,stroke:'var(--ink)',fill:'var(--ink)',fo:.12,dots:true}],{size:210,label:r.team.name+'のレーダーチャート'}):'')+'<div class="detail">'+CRIT.map(function(cr){return '<div><div class="k"><i class="sw" style="background:'+cr.col+'"></i>'+cr.name+'</div><div class="v">'+fmt(r.avg[cr.k])+'<small style="font-size:13px"> /10</small></div></div>'}).join('')+'</div></div>';
+      if(r.comments.length) h+='<ul class="comments">'+r.comments.map(function(m){return '<li>'+esc(m)+'</li>'}).join('')+'</ul>';
+    }
+    h+='</li>';
+  });
+  h+='</ol>';
+  var top=rows.filter(function(r){return r.n}).slice(0,3);
+  if(top.length){
+    var sty=[{stroke:'var(--ink)',fill:'var(--ink)',fo:.14,sw:3},{stroke:'var(--muted)',dash:'7 5',sw:2.5},{stroke:'var(--muted)',dash:'2 5',sw:2.5}];
+    h+='<section class="compare"><h2>上位チームの比較</h2>'+radar(top.map(function(r,i){return Object.assign({avg:r.avg},sty[i])}).reverse(),{size:340,label:'上位チームのレーダーチャート比較'})+
+      '<ul>'+top.map(function(r,i){var st=sty[i];return '<li><svg width="36" height="12" aria-hidden="true"><line x1="2" y1="6" x2="34" y2="6" stroke="'+st.stroke+'" stroke-width="'+st.sw+'"'+(st.dash?' stroke-dasharray="'+st.dash+'"':'')+' stroke-linecap="round"/></svg><b>'+r.rank+'位</b><span>'+esc(r.team.name)+'</span><small>'+fmt(r.pts)+' 点</small></li>'}).join('')+'</ul></section>';
+  }
+  if(rows.some(function(r){return r.n})){
+    h+='<section class="awards"><h2>部門別トップ</h2>'+CRIT.map(function(cr){var b=bestBy(rows,cr.k);return '<div class="award"><div class="k"><i class="sw" style="background:'+cr.col+'"></i>'+cr.name+'</div><b>'+(b?esc(b.team.name):'—')+'</b><small>'+(b?'平均 '+fmt(b.avg[cr.k])+' / 10':'')+'</small></div>'}).join('')+'</section>';
+  }
+  return h;
+}
+
+function reportBody(){
+  var c=S.config,rows=compute(),jn={};c.judges.forEach(function(j){jn[j.id]=j.name});
+  var now=new Date().toLocaleString('ja-JP'),total=c.teams.length*c.judges.length,done=doneCount();
+  var h='<div class="report"><div class="rhead"><h1>'+esc(c.title)+'　審査結果レポート</h1><p>作成日時 '+esc(now)+'</p>'+
+    '<div class="rsum"><span>参加チーム<b>'+c.teams.length+'</b></span><span>審査員<b>'+c.judges.length+'</b></span><span>採点完了<b>'+done+' / '+total+'</b></span></div>'+
+    '<p>審査員：'+c.judges.map(function(j){return esc(j.name)}).join('、')+'</p></div>';
+  h+='<h2 class="rh">総合ランキング</h2><div class="tblw"><table class="rtable"><thead><tr><th>順位</th><th>チーム</th><th>プロダクト</th>'+CRIT.map(function(cr){return '<th class="n">'+cr.short+'</th>'}).join('')+'<th class="n">合計（100点）</th><th class="n">審査数</th></tr></thead><tbody>'+
+    rows.map(function(r){return '<tr><td>'+(r.rank||'–')+'</td><td>'+esc(r.team.name)+'</td><td>'+esc(r.team.product||'')+'</td>'+CRIT.map(function(cr){return '<td class="n">'+(r.n?fmt(r.avg[cr.k]):'–')+'</td>'}).join('')+'<td class="n"><b>'+(r.n?fmt(r.pts):'–')+'</b></td><td class="n">'+r.n+'/'+c.judges.length+'</td></tr>'}).join('')+'</tbody></table></div>';
+  var scored=rows.filter(function(r){return r.n});
+  if(scored.length){
+    h+='<h2 class="rh">部門別トップ</h2><div class="tblw"><table class="rtable"><thead><tr><th>部門</th><th>チーム</th><th class="n">平均（10点）</th></tr></thead><tbody>'+
+      CRIT.map(function(cr){var b=bestBy(rows,cr.k);return '<tr><td><i class="sw" style="background:'+cr.col+';margin-right:8px;vertical-align:-1px"></i>'+cr.name+'</td><td>'+esc(b.team.name)+'</td><td class="n">'+fmt(b.avg[cr.k])+'</td></tr>'}).join('')+'</tbody></table></div>';
+  }
+  h+='<h2 class="rh">チーム別の評価</h2>';
+  rows.forEach(function(r){
+    var ss=c.judges.map(function(j){return {j:j,s:S.scores[j.id+'__'+r.team.id]}});
+    h+='<section class="rteam"><div class="rteam-h"><span class="rk">'+(r.rank?r.rank+'位':'–')+'</span><h3>'+esc(r.team.name)+'</h3><span>'+esc(r.team.product||'')+'</span><span class="pt">'+(r.n?fmt(r.pts)+' 点':'未採点')+'</span></div>';
+    h+='<div class="rteam-b">'+(r.n?radar([{avg:r.avg,stroke:'var(--ink)',fill:'var(--ink)',fo:.12,dots:true}],{size:230,label:r.team.name+'のレーダーチャート'}):'')+
+      '<div class="tblw"><table class="rtable"><thead><tr><th>審査員</th>'+CRIT.map(function(cr){return '<th class="n">'+cr.short+'</th>'}).join('')+'<th class="n">小計（30点）</th></tr></thead><tbody>'+
+      ss.map(function(x){var s=x.s;return '<tr><td>'+esc(x.j.name)+'</td>'+CRIT.map(function(cr){return '<td class="n">'+(s?s[cr.k]:'–')+'</td>'}).join('')+'<td class="n">'+(s?(s.impact+s.tech+s.ux):'–')+'</td></tr>'}).join('')+
+      (r.n?'<tr class="tot"><td>平均</td>'+CRIT.map(function(cr){return '<td class="n">'+fmt(r.avg[cr.k])+'</td>'}).join('')+'<td class="n">'+fmt(r.sum)+'</td></tr>':'')+'</tbody></table></div></div>';
+    var cm=ss.filter(function(x){return x.s&&x.s.comment});
+    if(cm.length)h+='<ul class="rcom">'+cm.map(function(x){return '<li><b>'+esc(x.j.name)+'</b>'+esc(x.s.comment)+'</li>'}).join('')+'</ul>';
+    h+='</section>';
+  });
+  h+='<h2 class="rh">審査基準</h2><dl class="rcrit">'+CRIT.map(function(cr){return '<dt><i class="sw" style="background:'+cr.col+'"></i>'+cr.name+'（10点）</dt><dd>'+cr.q+'。'+cr.hint+'</dd>'}).join('')+'</dl><p class="note">各基準を審査員ごとに1〜10点で採点し、審査員平均の合計（30点満点）を100点に換算して順位を決定。</p></div>';
+  return h;
+}
+/* ---------- data ---------- */
+var refreshT=null,loading=false,again=false;
+function scheduleRefresh(ms){clearTimeout(refreshT);refreshT=setTimeout(refresh,ms==null?250:ms)}
+async function refresh(){
+  if(loading){again=true;return}loading=true;
+  try{
+    var r=await Promise.all([
+      sb.from('event').select('title,open,rev').eq('id',1).single(),
+      sb.from('teams').select('id,name,product,created_at').order('created_at'),
+      sb.from('judges').select('id,name,created_at').order('created_at'),
+      sb.rpc('get_scores',{p_judge:S.role==='judge'?S.judgeId:null,p_pin:S.pin||null})
+    ]);
+    var e=r.find(function(x){return x.error});if(e)throw e.error;
+    S.config={title:r[0].data.title,open:r[0].data.open,teams:r[1].data||[],judges:r[2].data||[]};
+    var m={};(r[3].data||[]).forEach(function(s){m[s.judge_id+'__'+s.team_id]={judgeId:s.judge_id,teamId:s.team_id,impact:s.impact,tech:s.tech,ux:s.ux,comment:s.comment||''}});
+    S.scores=m;S.mode='live';
+    if(S.role==='judge'&&!S.config.judges.some(function(j){return j.id===S.judgeId}))logout(true);
+  }catch(err){
+    if(S.mode!=='live'){S.mode='error';S.err=(err&&err.message)||String(err)}
+  }finally{loading=false}
+  if(!R)render();
+  if(again){again=false;scheduleRefresh(0)}
+}
+async function call(fn,args){var res=await sb.rpc(fn,args);if(res.error)throw res.error;return res.data}
+function fail(e){var msg=(e&&e.message)||'通信に失敗しました';
+  if(e&&e.code==='42501'){logout(true);msg+='。もう一度ログインしてください'}
+  toast(msg)}
+function admin(fn,args,ok){S.busy=true;render();return call(fn,Object.assign({p_pin:S.pin},args)).then(function(){if(ok)toast(ok)}).catch(fail).finally(function(){S.busy=false;scheduleRefresh(0)})}
+function logout(silent){S.role=null;S.loginRole='judge';S.pin=null;S.judgeId=null;S.drafts={};ss('hk_auth',null);S.tab='results';if(!silent)toast('ログアウトしました');scheduleRefresh(0)}
+
+/* ---------- render ---------- */
+function render(){
+  var ae=document.activeElement,fid=ae&&ae.id,sel=null;
+  if(fid&&ae.setSelectionRange){try{sel=[ae.selectionStart,ae.selectionEnd]}catch(e){}}
+  var keep={};app.querySelectorAll('input[data-keep]').forEach(function(i){keep[i.id]=i.value});
+  var c=S.config,h='<div class="wrap"><header class="top"><div><h1>'+esc(c.title||'最終審査ボード')+'</h1><p>単なる技術デモではなく、明日から現場で使いたくなる解決策を選ぶ</p></div><div class="who-am-i">';
+  if(isAdmin()&&compute().some(function(r){return r.n}))h+='<button class="btn stagebtn" data-act="stage">発表モードを開始</button>';
+  if(S.role)h+='<span class="me">'+(isAdmin()?'主催者':esc(judgeName(S.judgeId))+' さん（審査員）')+'</span><button class="btn small" data-act="logout">ログアウト</button>';
+  else if(S.mode==='live')h+='<button class="btn small" data-act="tab" data-v="login">審査員・主催者ログイン</button>';
+  h+='</div></header>';
+  if(S.role){
+    var tabs=[['results','結果ボード']];if(S.role==='judge')tabs.push(['judge','採点する']);if(isAdmin())tabs.push(['report','レポート'],['settings','チームと審査員']);
+    h+='<nav class="tabs" aria-label="表示切替">'+tabs.map(function(t){return '<button class="tab" data-act="tab" data-v="'+t[0]+'" aria-current="'+(S.tab===t[0])+'">'+t[1]+'</button>'}).join('')+'</nav>';
+  }
+  var tab=S.tab;
+  if(S.mode==='setup')h+='<div class="empty"><h2>接続設定がまだです</h2><p>config.js に Supabase の Project URL と Publishable key（anon key）を設定してください。</p></div>';
+  else if(S.mode==='error')h+='<div class="empty"><h2>データを読み込めません</h2><p>Supabase の設定（config.js の値、schema.sql の実行）を確認してください。</p><p class="note">'+esc(S.err)+'</p></div>';
+  else if(S.mode==='loading')h+='<p class="note" style="margin-top:24px">読み込み中…</p>';
+  else if(tab==='login'&&!S.role)h+=vLogin();
+  else if(tab==='judge'&&S.role==='judge')h+=vJudge();
+  else if(tab==='settings'&&isAdmin())h+=vSettings();
+  else if(tab==='report'&&isAdmin())h+=vReport();
+  else h+=vResults();
+  app.innerHTML=h+'</div>';
+  Object.keys(keep).forEach(function(id){var el=document.getElementById(id);if(el)el.value=keep[id]});
+  if(fid){var el=document.getElementById(fid);if(el){el.focus();if(sel&&el.setSelectionRange)try{el.setSelectionRange(sel[0],sel[1])}catch(e){}}}
+}
+
+function vLogin(){
+  var c=S.config,h='<section class="login"><h2>ログイン</h2><p class="note">審査員は名前を選び、主催者から渡されたPINを入力してください。</p>'+
+    '<div class="judges" role="group" aria-label="ログインの種類"><button class="chip" data-act="lrole" data-v="judge" aria-pressed="'+(S.loginRole==='judge')+'">審査員</button><button class="chip" data-act="lrole" data-v="admin" aria-pressed="'+(S.loginRole==='admin')+'">主催者</button></div>';
+  if(S.loginRole==='judge'){
+    if(!c.judges.length)return h+'<p class="banner">審査員がまだ登録されていません。主催者としてログインし、審査員を登録してください。</p></section>';
+    h+='<p style="margin:18px 0 0;font-weight:700">あなたの名前</p><div class="judges" role="group" aria-label="審査員">'+c.judges.map(function(j){return '<button class="chip" data-act="ljudge" data-id="'+esc(j.id)+'" aria-pressed="'+(S.loginJudge===j.id)+'">'+esc(j.name)+'</button>'}).join('')+'</div>';
+  }
+  h+='<div class="field" style="margin-top:18px;max-width:420px"><input type="password" id="f_pin" data-keep autocomplete="off" placeholder="PIN" aria-label="PIN"><button class="btn primary" data-act="login"'+(S.busy?' disabled':'')+'>ログイン</button></div></section>';
+  return h;
+}
+function vReport(){
+  if(!S.config.teams.length)return '<div class="empty"><h2>レポートに載せる結果がありません</h2><p>参加チームを登録し、採点を始めるとレポートを作成できます。</p></div>';
+  return '<div class="rep-actions"><button class="btn primary" data-act="print">印刷・PDFで保存</button><button class="btn" data-act="dlhtml">レポートをダウンロード（HTML）</button><button class="btn" data-act="dlcsv">採点データをダウンロード（CSV）</button></div>'+reportBody();
+}
+function curVal(tid,k){var d=S.drafts[tid];if(d&&d[k]!=null)return d[k];var s=S.scores[S.judgeId+'__'+tid];return s?s[k]:null}
+function sheetStatus(tid){var s=S.scores[S.judgeId+'__'+tid];if(S.drafts[tid])return ['dirty','未保存の変更'];if(s)return ['ok','保存済み'];return ['','未採点']}
+
+function vJudge(){
+  var c=S.config;
+  if(!c.teams.length)return '<div class="empty"><h2>参加チームが未登録です</h2><p>主催者がチームを登録すると、ここに採点シートが表示されます。</p></div>';
+  var saved=c.teams.filter(function(t){return S.scores[S.judgeId+'__'+t.id]}).length;
+  var h='<p class="note" style="margin-top:20px">'+c.teams.length+' チーム中 '+saved+' チーム保存済み。各項目 1（不十分）〜 10（卓越）で採点します。</p>';
+  c.teams.forEach(function(t){
+    var st=sheetStatus(t.id),d=S.drafts[t.id],s=S.scores[S.judgeId+'__'+t.id];
+    var com=d&&d.comment!=null?d.comment:(s&&s.comment||'');
+    h+='<section class="sheet"><header><div><h3>'+esc(t.name)+'</h3><p>'+esc(t.product||'')+'</p></div><span class="status '+st[0]+'">'+st[1]+'</span></header>';
+    CRIT.forEach(function(cr){
+      var v=curVal(t.id,cr.k);
+      h+='<div class="crit"><div class="crit-h"><i class="sw" style="background:'+cr.col+'"></i><b>'+cr.name+'</b><small>'+cr.q+'</small></div><small class="note" style="display:block;margin:-4px 0 8px">'+cr.hint+'</small><div class="scale" role="radiogroup" aria-label="'+cr.name+'">';
+      for(var i=1;i<=10;i++){var on=v===i;h+='<button data-act="score" data-t="'+esc(t.id)+'" data-k="'+cr.k+'" data-v="'+i+'" aria-pressed="'+on+'"'+(on?' style="background:'+cr.col+'"':'')+'>'+i+'</button>'}
+      h+='</div><div class="scale-ends"><span>不十分</span><span>卓越</span></div></div>';
+    });
+    h+='<textarea id="cm_'+esc(t.id)+'" data-act="comment" data-t="'+esc(t.id)+'" placeholder="講評（任意・結果ボードに審査員名なしで表示されます）">'+esc(com)+'</textarea><div class="act"><button class="btn primary" data-act="save" data-t="'+esc(t.id)+'">この採点を保存</button></div></section>';
+  });
+  return h;
+}
+
+function vSettings(){
+  var c=S.config,dis=S.busy?' disabled':'';
+  var h='<section class="set"><div><h2>イベント名</h2><p>ボードと発表モードの見出しになります。</p></div><div class="field"><input type="text" id="f_title" data-keep value="'+esc(c.title)+'" aria-label="イベント名"><button class="btn" data-act="title"'+dis+'>変更を保存</button></div></section>';
+  h+='<section class="set"><div><h2>参加チーム</h2><p>'+c.teams.length+' チーム登録済み。数に上限はありません。</p></div><div><div class="field"><input type="text" id="f_tname" data-keep placeholder="チーム名" aria-label="チーム名"><input type="text" id="f_tprod" data-keep placeholder="プロダクト名（任意）" aria-label="プロダクト名"><button class="btn primary" data-act="addTeam"'+dis+'>チームを追加</button></div><ul class="list">'+
+    c.teams.map(function(t){return '<li><span>'+esc(t.name)+'<small>'+esc(t.product||'')+'</small></span>'+(S.confirm==='delTeam:'+t.id?'<button class="btn small danger" data-act="delTeam" data-id="'+esc(t.id)+'">採点ごと削除する</button>':'<button class="x" data-act="delTeam" data-id="'+esc(t.id)+'" aria-label="'+esc(t.name)+'を削除">×</button>')+'</li>'}).join('')+'</ul></div></section>';
+  h+='<section class="set"><div><h2>審査員</h2><p>名前とPINを登録し、PINを本人に伝えてください。PINは6桁以上を推奨します。</p></div><div><div class="field"><input type="text" id="f_jname" data-keep placeholder="審査員の名前" aria-label="審査員の名前"><input type="text" id="f_jpin" data-keep placeholder="PIN（4文字以上）" autocomplete="off" aria-label="審査員のPIN"><button class="btn primary" data-act="addJudge"'+dis+'>審査員を追加</button></div><ul class="list">'+
+    c.judges.map(function(j){return '<li><span>'+esc(j.name)+'</span><button class="btn small" data-act="resetPin" data-id="'+esc(j.id)+'">PINを再設定</button>'+(S.confirm==='delJudge:'+j.id?'<button class="btn small danger" data-act="delJudge" data-id="'+esc(j.id)+'">採点ごと削除する</button>':'<button class="x" data-act="delJudge" data-id="'+esc(j.id)+'" aria-label="'+esc(j.name)+'を削除">×</button>')+'</li>'}).join('')+'</ul></div></section>';
+  h+='<section class="set"><div><h2>参加者への表示</h2><p>オフの間は、採点データ自体が参加者に送られません。</p></div><div><label class="toggle"><input type="checkbox" data-act="open" '+(c.open?'checked':'')+dis+'>参加者に結果を表示する</label></div></section>';
+  h+='<section class="set"><div><h2>リハーサル後のリセット</h2><p>チームと審査員は残り、採点だけ消えます。</p></div><div><button class="btn danger'+(S.confirm==='wipe'?' primary':'')+'" data-act="wipe"'+dis+'>'+(S.confirm==='wipe'?'もう一度押すと消去します（元に戻せません）':'すべての採点を消去')+'</button></div></section>';
+  return h;
+}
+
+/* ---------- downloads ---------- */
+function stamp(){var d=new Date(),z=function(n){return ('0'+n).slice(-2)};return d.getFullYear()+z(d.getMonth()+1)+z(d.getDate())+'_'+z(d.getHours())+z(d.getMinutes())}
+function save(name,data,type){var a=document.createElement('a'),u=URL.createObjectURL(new Blob([data],{type:type}));a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(u)},2000)}
+
+/* ---------- inline confirm (no browser dialogs) ---------- */
+function armed(key){if(S.confirm===key){S.confirm=null;clearTimeout(armT);return true}S.confirm=key;render();clearTimeout(armT);armT=setTimeout(function(){if(S.confirm===key){S.confirm=null;render()}},5000);return false}
+var armT=null;
+/* ---------- events ---------- */
+app.addEventListener('click',function(e){
+  var b=e.target.closest('[data-act]');if(!b)return;var a=b.dataset.act,c=S.config;
+  if(a==='tab'){S.tab=b.dataset.v;render();window.scrollTo(0,0)}
+  else if(a==='stage')openStage();
+  else if(a==='logout')logout();
+  else if(a==='expand'){S.expanded=S.expanded===b.dataset.id?null:b.dataset.id;render()}
+  else if(a==='lrole'){S.loginRole=b.dataset.v;render()}
+  else if(a==='ljudge'){S.loginJudge=b.dataset.id;render();var pi=document.getElementById('f_pin');if(pi)pi.focus()}
+  else if(a==='login'){
+    var pin=document.getElementById('f_pin').value;
+    if(S.loginRole==='judge'&&!S.loginJudge){toast('名前を選んでください');return}
+    if(!pin){toast('PINを入力してください');return}
+    S.busy=true;render();
+    call('verify_login',{p_role:S.loginRole,p_judge:S.loginRole==='judge'?S.loginJudge:null,p_pin:pin}).then(function(ok){
+      if(!ok){toast('PINが正しくありません');return}
+      S.role=S.loginRole;S.pin=pin;S.judgeId=S.role==='judge'?S.loginJudge:null;S.tab=S.role==='judge'?'judge':'settings';
+      ss('hk_auth',JSON.stringify({role:S.role,pin:pin,judgeId:S.judgeId}));document.getElementById('f_pin').value='';scheduleRefresh(0);
+    }).catch(fail).finally(function(){S.busy=false;render()});
+  }
+  else if(a==='score'){var t=b.dataset.t;S.drafts[t]=S.drafts[t]||{};S.drafts[t][b.dataset.k]=+b.dataset.v;render()}
+  else if(a==='save'){
+    var t2=b.dataset.t,vals={};var miss=CRIT.filter(function(cr){var v=curVal(t2,cr.k);vals[cr.k]=v;return v==null});
+    if(miss.length){toast(miss.map(function(m){return m.name}).join('・')+' の点数が未選択です');return}
+    var d=S.drafts[t2],old=S.scores[S.judgeId+'__'+t2],com=(d&&d.comment!=null?d.comment:(old&&old.comment||'')).trim();
+    b.disabled=true;
+    call('submit_score',{p_judge:S.judgeId,p_pin:S.pin,p_team:t2,p_impact:vals.impact,p_tech:vals.tech,p_ux:vals.ux,p_comment:com}).then(function(){
+      S.scores[S.judgeId+'__'+t2]={judgeId:S.judgeId,teamId:t2,impact:vals.impact,tech:vals.tech,ux:vals.ux,comment:com};delete S.drafts[t2];render();toast('保存しました');scheduleRefresh();
+    }).catch(function(err){b.disabled=false;fail(err)});
+  }
+  else if(a==='title'){var v=document.getElementById('f_title').value.trim();if(v)admin('admin_update_event',{p_title:v,p_open:null},'イベント名を変更しました')}
+  else if(a==='addTeam'){var n=document.getElementById('f_tname'),p=document.getElementById('f_tprod');if(!n.value.trim()){n.focus();return}
+    var nv=n.value.trim(),pv=p.value.trim();n.value='';p.value='';admin('admin_add_team',{p_name:nv,p_product:pv}).then(function(){var el=document.getElementById('f_tname');if(el)el.focus()})}
+  else if(a==='addJudge'){var jn=document.getElementById('f_jname'),jp=document.getElementById('f_jpin');if(!jn.value.trim()){jn.focus();return}
+    if(jp.value.length<4){toast('PINは4文字以上にしてください');jp.focus();return}
+    var jv=jn.value.trim(),pp=jp.value;jn.value='';jp.value='';admin('admin_add_judge',{p_name:jv,p_judge_pin:pp},jv+' さんを登録しました')}
+  else if(a==='resetPin'){var np=prompt('新しいPIN（4文字以上）を入力してください');if(np==null)return;if(np.length<4){toast('PINは4文字以上にしてください');return}admin('admin_reset_judge_pin',{p_id:b.dataset.id,p_judge_pin:np},'PINを再設定しました')}
+  else if(a==='delTeam'){var tm=c.teams.find(function(x){return x.id===b.dataset.id});if(!armed('delTeam:'+tm.id))return;admin('admin_delete_team',{p_id:tm.id},'削除しました')}
+  else if(a==='delJudge'){var jj=c.judges.find(function(x){return x.id===b.dataset.id});if(!armed('delJudge:'+jj.id))return;admin('admin_delete_judge',{p_id:jj.id},'削除しました')}
+  else if(a==='wipe'){if(!armed('wipe'))return;admin('admin_wipe_scores',{},'採点を消去しました')}
+  else if(a==='print')window.print();
+  else if(a==='dlhtml'){var css=document.getElementById('css').textContent;
+    var html='<!doctype html>\n<html lang="ja" data-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>'+esc(c.title)+' 審査結果レポート</title><link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@400;500;700;800&display=swap" rel="stylesheet"><style>'+css+'</style></head><body><div class="wrap">'+reportBody()+'</div></body></html>';
+    save('審査結果レポート_'+stamp()+'.html',html,'text/html;charset=utf-8')}
+  else if(a==='dlcsv'){var jn2={},tn={};c.judges.forEach(function(j){jn2[j.id]=j.name});c.teams.forEach(function(t){tn[t.id]=t});
+    var q=function(v){v=String(v==null?'':v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v};
+    var lines=[['審査員','チーム','プロダクト'].concat(CRIT.map(function(cr){return cr.name}),['小計（30点）','講評'])];
+    Object.keys(S.scores).forEach(function(k){var s=S.scores[k];if(!jn2[s.judgeId]||!tn[s.teamId])return;lines.push([jn2[s.judgeId],tn[s.teamId].name,tn[s.teamId].product||'',s.impact,s.tech,s.ux,s.impact+s.tech+s.ux,s.comment||''])});
+    save('採点データ_'+stamp()+'.csv','\ufeff'+lines.map(function(l){return l.map(q).join(',')}).join('\r\n'),'text/csv;charset=utf-8')}
+});
+app.addEventListener('change',function(e){if(e.target.dataset.act==='open')admin('admin_update_event',{p_title:null,p_open:e.target.checked},e.target.checked?'参加者に結果を表示しました':'参加者には非表示にしました')});
+app.addEventListener('input',function(e){var t=e.target;if(t.dataset.act==='comment'){var id=t.dataset.t;S.drafts[id]=S.drafts[id]||{};S.drafts[id].comment=t.value;
+  var st=t.closest('.sheet').querySelector('.status');st.className='status dirty';st.textContent='未保存の変更'}});
+app.addEventListener('keydown',function(e){
+  if(e.key!=='Enter')return;var t=e.target;
+  if(t.matches('#f_tname,#f_tprod'))app.querySelector('[data-act=addTeam]').click();
+  else if(t.matches('#f_jname,#f_jpin'))app.querySelector('[data-act=addJudge]').click();
+  else if(t.matches('#f_pin'))app.querySelector('[data-act=login]').click();
+  else if(t.matches('#f_title'))app.querySelector('[data-act=title]').click();
+  else if(t.matches('.row')){e.preventDefault();t.click()}
+});
+/* ---------- reveal stage ---------- */
+var R=null;
+function openStage(){
+  var rows=compute().filter(function(r){return r.n});if(!rows.length){toast('まだ採点がありません');return}
+  var steps=[{t:'intro'}];
+  for(var i=rows.length-1;i>=1;i--)steps.push({t:'rank',r:rows[i]});
+  if(rows.length>1)steps.push({t:'drum'});
+  steps.push({t:'rank',r:rows[0],top:true});steps.push({t:'awards',rows:rows});
+  R={steps:steps,i:0};stage.hidden=false;document.body.classList.add('staging');drawStage();stage.focus();
+}
+function closeStage(){stage.hidden=true;R=null;document.body.classList.remove('staging');stopConfetti();render()}
+function revealedList(){
+  var out=[];for(var i=1;i<R.i;i++){var s=R.steps[i];if(s.t==='rank')out.push(s.r)}
+  if(!out.length)return '';
+  return '<div class="st-list">'+out.reverse().map(function(r){return '<span><b>'+r.rank+'位</b>'+esc(r.team.name)+' '+fmt(r.pts)+'</span>'}).join('')+'</div>';
+}
+function drawStage(){
+  var s=R.steps[R.i],h='';
+  stopConfetti();
+  if(s.t==='intro'){
+    h='<div class="st-main st-in"><p class="st-ev">'+esc(S.config.title)+'</p><h2 class="st-title">最終審査結果発表</h2><div class="st-crit">'+CRIT.map(function(c){return '<span><i class="sw" style="background:'+c.sc+'"></i>'+c.name+'</span>'}).join('')+'</div></div>';
+  }else if(s.t==='drum'){
+    h='<div class="st-main"><div class="drum">第1位は…</div>'+revealedList()+'</div>';
+  }else if(s.t==='rank'){
+    var r=s.r;
+    h='<div class="st-main st-in'+(s.top?' top1':'')+'"><div class="st-rank">第<em>'+r.rank+'</em>位</div><div class="st-team">'+esc(r.team.name)+'</div><p class="st-prod">'+esc(r.team.product||'')+'</p><div class="st-body">'+radar([{avg:r.avg,stroke:s.top?'#FFC75A':'#FFFFFF',fill:s.top?'#FFC75A':'#FFFFFF',fo:.22,sw:3,dots:true}],{size:300,dark:true,grow:true,grid:'rgba(255,255,255,.22)',label:r.team.name+'のレーダーチャート'})+'<div class="st-bars">'+
+      CRIT.map(function(c){return '<div class="st-bar"><span>'+c.name+'</span><span class="tr"><i data-w="'+(r.avg[c.k]*10)+'" style="background:'+c.sc+'"></i></span><span class="v">'+fmt(r.avg[c.k])+'</span></div>'}).join('')+
+      '</div></div><div class="st-total"><span data-count="'+r.pts+'">0.0</span><small>点</small></div>'+(s.top?'':revealedList())+'</div>';
+  }else{
+    var rows=s.rows;
+    h='<div class="st-main st-in"><h2 class="st-title" style="font-size:clamp(32px,5vw,64px)">部門別トップ</h2><div class="st-awards">'+CRIT.map(function(c){var b=bestBy(rows,c.k);return '<div><div class="k"><i class="sw" style="background:'+c.sc+'"></i>'+c.name+'</div><b>'+esc(b.team.name)+'</b><small>平均 '+fmt(b.avg[c.k])+' / 10</small></div>'}).join('')+'</div></div>';
+  }
+  h+='<div class="st-foot"><span>クリック／スペースで次へ　←で戻る　Escで終了</span><span>'+(R.i+1)+' / '+R.steps.length+'</span><button class="st-close" data-close>終了</button></div>';
+  stage.innerHTML=h;
+  if(s.t==='rank'){
+    var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+    setTimeout(function(){stage.querySelectorAll('.tr i').forEach(function(i){i.style.width=i.dataset.w+'%'});stage.querySelectorAll('.radar .shape').forEach(function(g){g.style.transform='scale(1)'})},reduce?0:350);
+    var el=stage.querySelector('[data-count]'),to=+el.dataset.count;
+    if(reduce)el.textContent=fmt(to);else{var t0=null,dur=1600;var step=function(ts){if(!R)return;if(!t0)t0=ts+350;var p=Math.max(0,Math.min(1,(ts-t0)/dur));el.textContent=fmt(to*(1-Math.pow(1-p,3)));if(p<1)requestAnimationFrame(step)};requestAnimationFrame(step)}
+    if(s.top&&!reduce)setTimeout(confetti,1500);
+  }
+}
+function go(d){if(!R)return;var n=R.i+d;if(n<0||n>=R.steps.length){if(n>=R.steps.length)closeStage();return}R.i=n;drawStage()}
+stage.addEventListener('click',function(e){if(e.target.closest('[data-close]')){closeStage();return}go(1)});
+document.addEventListener('keydown',function(e){if(!R)return;
+  if(e.key===' '||e.key==='Enter'||e.key==='ArrowRight'||e.key==='PageDown'){e.preventDefault();go(1)}
+  else if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();go(-1)}
+  else if(e.key==='Escape')closeStage()});
+
+/* confetti */
+var cv=document.getElementById('confetti'),cx=cv.getContext('2d'),parts=[],raf=null;
+function confetti(){
+  cv.width=innerWidth*devicePixelRatio;cv.height=innerHeight*devicePixelRatio;cx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+  var cols=['#F5A83A','#2FC2B2','#D06BDD','#FFC75A','#FFFFFF'];parts=[];
+  for(var i=0;i<220;i++)parts.push({x:innerWidth/2+(Math.random()-.5)*200,y:innerHeight*.45,vx:(Math.random()-.5)*16,vy:-Math.random()*16-4,w:6+Math.random()*8,h:4+Math.random()*6,r:Math.random()*6,vr:(Math.random()-.5)*.3,c:cols[i%cols.length],life:0});
+  var tick=function(){cx.clearRect(0,0,innerWidth,innerHeight);var alive=0;
+    parts.forEach(function(p){p.vy+=.35;p.vx*=.99;p.x+=p.vx;p.y+=p.vy;p.r+=p.vr;p.life++;if(p.y<innerHeight+20){alive++;cx.save();cx.translate(p.x,p.y);cx.rotate(p.r);cx.fillStyle=p.c;cx.fillRect(-p.w/2,-p.h/2,p.w,p.h);cx.restore()}});
+    if(alive)raf=requestAnimationFrame(tick);else stopConfetti()};
+  raf=requestAnimationFrame(tick);
+}
+function stopConfetti(){if(raf)cancelAnimationFrame(raf);raf=null;cx.clearRect(0,0,cv.width,cv.height)}
+
+/* ---------- boot ---------- */
+try{var au=JSON.parse(ss('hk_auth')||'null');if(au&&au.role&&au.pin){S.role=au.role;S.pin=au.pin;S.judgeId=au.judgeId||null;S.tab=S.role==='judge'?'judge':'results'}}catch(e){}
+if(!CFG.url||!CFG.key||/xxxx/.test(CFG.url)||!window.supabase){S.mode='setup';render();return}
+sb=window.supabase.createClient(CFG.url,CFG.key,{auth:{persistSession:false}});
+render();refresh();
+sb.channel('board').on('postgres_changes',{event:'*',schema:'public',table:'event'},function(){scheduleRefresh()}).subscribe();
+setInterval(function(){if(!document.hidden)scheduleRefresh(0)},20000);
+document.addEventListener('visibilitychange',function(){if(!document.hidden)scheduleRefresh(0)});
+})();
+
+</script>
+</body></html>
