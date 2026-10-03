@@ -603,7 +603,8 @@ function stopConfetti(){if(raf)cancelAnimationFrame(raf);raf=null;cx.clearRect(0
 /* ---------- boot ---------- */
 try{var au=JSON.parse(ss('hk_auth')||'null');if(au&&au.role&&au.pin){S.role=au.role;S.pin=au.pin;S.judgeId=au.judgeId||null;S.tab=S.role==='judge'?'judge':'results'}}catch(e){}
 if(!CFG.url||!CFG.key||/xxxx/.test(CFG.url)||!window.supabase){S.mode='setup';render();return}
-sb=window.supabase.createClient(CFG.url,CFG.key,{auth:{persistSession:false}});
+var URL0=String(CFG.url).trim().replace(/\/+$/,'').replace(/\/(rest|auth|realtime)\/v1$/,'');
+sb=window.supabase.createClient(URL0,String(CFG.key).trim(),{auth:{persistSession:false}});
 render();refresh();
 sb.channel('board').on('postgres_changes',{event:'*',schema:'public',table:'event'},function(){scheduleRefresh()}).subscribe();
 setInterval(function(){if(!document.hidden)scheduleRefresh(0)},20000);
