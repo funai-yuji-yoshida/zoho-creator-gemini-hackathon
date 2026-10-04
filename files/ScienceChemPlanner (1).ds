@@ -1,0 +1,1376 @@
+/*
+ * 理科 指導計画・薬品管理
+ * このファイルはスクリプトで生成されています。手で編集しないでください。
+ */
+application "理科 指導計画・薬品管理"
+{
+	date format = "yyyy-MM-dd"
+	time zone = "Asia/Tokyo"
+	time format = "24-hr"
+
+	forms
+	{
+		form Sci_Class_Form
+		{
+			displayname = "【システム用】クラス数・人数規模"
+			success message = "保存しました。"
+			Section
+			(
+				type = section
+				row = 1
+				column = 0
+				width = medium
+			)
+			school_year
+			(
+				type = text
+				displayname = "年度"
+				row = 1
+				column = 1
+				width = medium
+			)
+			grade
+			(
+				type = text
+				displayname = "学年"
+				row = 1
+				column = 1
+				width = medium
+			)
+			class_count
+			(
+				type = number
+				displayname = "クラス数"
+				row = 1
+				column = 1
+				width = medium
+			)
+			students_per_class
+			(
+				type = number
+				displayname = "1クラスの人数"
+				row = 1
+				column = 1
+				width = medium
+			)
+			groups_per_class
+			(
+				type = number
+				displayname = "1クラスの班数"
+				row = 1
+				column = 1
+				width = medium
+			)
+			note
+			(
+				type = textarea
+				displayname = "備考"
+				height = 300px
+				row = 1
+				column = 1
+				width = medium
+			)
+			is_active
+			(
+				type = text
+				displayname = "有効（true/false）"
+				row = 1
+				column = 1
+				width = medium
+			)
+			updated_at
+			(
+				type = text
+				displayname = "更新日時"
+				row = 1
+				column = 1
+				width = medium
+			)
+			actions
+			{
+				on add
+				{
+					submit
+					(
+						type = submit
+						displayname = "送信"
+					)
+					reset
+					(
+						type = reset
+						displayname = "リセット"
+					)
+				}
+				on edit
+				{
+					update
+					(
+						type = submit
+						displayname = "更新"
+					)
+					cancel
+					(
+						type = cancel
+						displayname = "キャンセル"
+					)
+				}
+			}
+		}
+		form Sci_Experiment_Form
+		{
+			displayname = "【システム用】実験"
+			success message = "保存しました。"
+			Section
+			(
+				type = section
+				row = 1
+				column = 0
+				width = medium
+			)
+			exp_key
+			(
+				type = text
+				displayname = "実験キー"
+				row = 1
+				column = 1
+				width = medium
+			)
+			exp_name
+			(
+				type = text
+				displayname = "実験名"
+				row = 1
+				column = 1
+				width = medium
+			)
+			unit_name
+			(
+				type = text
+				displayname = "単元名"
+				row = 1
+				column = 1
+				width = medium
+			)
+			note
+			(
+				type = textarea
+				displayname = "備考"
+				height = 300px
+				row = 1
+				column = 1
+				width = medium
+			)
+			is_active
+			(
+				type = text
+				displayname = "有効（true/false）"
+				row = 1
+				column = 1
+				width = medium
+			)
+			updated_at
+			(
+				type = text
+				displayname = "更新日時"
+				row = 1
+				column = 1
+				width = medium
+			)
+			actions
+			{
+				on add
+				{
+					submit
+					(
+						type = submit
+						displayname = "送信"
+					)
+					reset
+					(
+						type = reset
+						displayname = "リセット"
+					)
+				}
+				on edit
+				{
+					update
+					(
+						type = submit
+						displayname = "更新"
+					)
+					cancel
+					(
+						type = cancel
+						displayname = "キャンセル"
+					)
+				}
+			}
+		}
+		form Sci_Plan_Form
+		{
+			displayname = "【システム用】年間指導計画"
+			success message = "保存しました。"
+			Section
+			(
+				type = section
+				row = 1
+				column = 0
+				width = medium
+			)
+			plan_key
+			(
+				type = text
+				displayname = "計画キー"
+				row = 1
+				column = 1
+				width = medium
+			)
+			school_year
+			(
+				type = text
+				displayname = "年度"
+				row = 1
+				column = 1
+				width = medium
+			)
+			grade
+			(
+				type = text
+				displayname = "学年"
+				row = 1
+				column = 1
+				width = medium
+			)
+			plan_month
+			(
+				type = number
+				displayname = "月"
+				row = 1
+				column = 1
+				width = medium
+			)
+			plan_date
+			(
+				type = text
+				displayname = "実施予定日（任意）"
+				row = 1
+				column = 1
+				width = medium
+			)
+			unit_name
+			(
+				type = text
+				displayname = "単元名"
+				row = 1
+				column = 1
+				width = medium
+			)
+			exp_key
+			(
+				type = text
+				displayname = "実験キー"
+				row = 1
+				column = 1
+				width = medium
+			)
+			exp_name
+			(
+				type = text
+				displayname = "実験名"
+				row = 1
+				column = 1
+				width = medium
+			)
+			note
+			(
+				type = textarea
+				displayname = "備考"
+				height = 300px
+				row = 1
+				column = 1
+				width = medium
+			)
+			is_active
+			(
+				type = text
+				displayname = "有効（true/false）"
+				row = 1
+				column = 1
+				width = medium
+			)
+			updated_at
+			(
+				type = text
+				displayname = "更新日時"
+				row = 1
+				column = 1
+				width = medium
+			)
+			actions
+			{
+				on add
+				{
+					submit
+					(
+						type = submit
+						displayname = "送信"
+					)
+					reset
+					(
+						type = reset
+						displayname = "リセット"
+					)
+				}
+				on edit
+				{
+					update
+					(
+						type = submit
+						displayname = "更新"
+					)
+					cancel
+					(
+						type = cancel
+						displayname = "キャンセル"
+					)
+				}
+			}
+		}
+		form Sci_Chemical_Form
+		{
+			displayname = "【システム用】薬品"
+			success message = "保存しました。"
+			Section
+			(
+				type = section
+				row = 1
+				column = 0
+				width = medium
+			)
+			chem_key
+			(
+				type = text
+				displayname = "薬品キー"
+				row = 1
+				column = 1
+				width = medium
+			)
+			chem_name
+			(
+				type = text
+				displayname = "薬品名"
+				row = 1
+				column = 1
+				width = medium
+			)
+			unit
+			(
+				type = text
+				displayname = "単位"
+				row = 1
+				column = 1
+				width = medium
+			)
+			stock_qty
+			(
+				type = number
+				displayname = "現在庫"
+				row = 1
+				column = 1
+				width = medium
+			)
+			ordered_qty
+			(
+				type = number
+				displayname = "発注済み数量"
+				row = 1
+				column = 1
+				width = medium
+			)
+			arrival_date
+			(
+				type = text
+				displayname = "納品予定日"
+				row = 1
+				column = 1
+				width = medium
+			)
+			lead_days
+			(
+				type = number
+				displayname = "納品までの日数"
+				row = 1
+				column = 1
+				width = medium
+			)
+			supplier
+			(
+				type = text
+				displayname = "発注先"
+				row = 1
+				column = 1
+				width = medium
+			)
+			hazard
+			(
+				type = text
+				displayname = "区分（毒物・劇物等）"
+				row = 1
+				column = 1
+				width = medium
+			)
+			order_by
+			(
+				type = text
+				displayname = "発注期限（自動計算）"
+				row = 1
+				column = 1
+				width = medium
+			)
+			shortage_qty
+			(
+				type = number
+				displayname = "不足数量（自動計算）"
+				row = 1
+				column = 1
+				width = medium
+			)
+			alert_level
+			(
+				type = text
+				displayname = "通知区分（自動計算）"
+				row = 1
+				column = 1
+				width = medium
+			)
+			note
+			(
+				type = textarea
+				displayname = "備考"
+				height = 300px
+				row = 1
+				column = 1
+				width = medium
+			)
+			is_active
+			(
+				type = text
+				displayname = "有効（true/false）"
+				row = 1
+				column = 1
+				width = medium
+			)
+			updated_at
+			(
+				type = text
+				displayname = "更新日時"
+				row = 1
+				column = 1
+				width = medium
+			)
+			actions
+			{
+				on add
+				{
+					submit
+					(
+						type = submit
+						displayname = "送信"
+					)
+					reset
+					(
+						type = reset
+						displayname = "リセット"
+					)
+				}
+				on edit
+				{
+					update
+					(
+						type = submit
+						displayname = "更新"
+					)
+					cancel
+					(
+						type = cancel
+						displayname = "キャンセル"
+					)
+				}
+			}
+		}
+		form Sci_ExpChem_Form
+		{
+			displayname = "【システム用】実験ごとの使用薬品"
+			success message = "保存しました。"
+			Section
+			(
+				type = section
+				row = 1
+				column = 0
+				width = medium
+			)
+			exp_key
+			(
+				type = text
+				displayname = "実験キー"
+				row = 1
+				column = 1
+				width = medium
+			)
+			exp_name
+			(
+				type = text
+				displayname = "実験名"
+				row = 1
+				column = 1
+				width = medium
+			)
+			chem_key
+			(
+				type = text
+				displayname = "薬品キー"
+				row = 1
+				column = 1
+				width = medium
+			)
+			chem_name
+			(
+				type = text
+				displayname = "薬品名"
+				row = 1
+				column = 1
+				width = medium
+			)
+			basis
+			(
+				type = text
+				displayname = "基準（per_group/per_student/per_class）"
+				row = 1
+				column = 1
+				width = medium
+			)
+			amount
+			(
+				type = number
+				displayname = "使用量"
+				row = 1
+				column = 1
+				width = medium
+			)
+			unit
+			(
+				type = text
+				displayname = "単位"
+				row = 1
+				column = 1
+				width = medium
+			)
+			is_active
+			(
+				type = text
+				displayname = "有効（true/false）"
+				row = 1
+				column = 1
+				width = medium
+			)
+			updated_at
+			(
+				type = text
+				displayname = "更新日時"
+				row = 1
+				column = 1
+				width = medium
+			)
+			actions
+			{
+				on add
+				{
+					submit
+					(
+						type = submit
+						displayname = "送信"
+					)
+					reset
+					(
+						type = reset
+						displayname = "リセット"
+					)
+				}
+				on edit
+				{
+					update
+					(
+						type = submit
+						displayname = "更新"
+					)
+					cancel
+					(
+						type = cancel
+						displayname = "キャンセル"
+					)
+				}
+			}
+		}
+	}
+
+	reports
+	{
+		list Sci_Class_Report
+		{
+			displayName = "クラス数・人数規模 一覧"
+			show all rows from Sci_Class_Form
+			(
+				school_year as "年度"
+				grade as "学年"
+				class_count as "クラス数"
+				students_per_class as "1クラスの人数"
+				groups_per_class as "1クラスの班数"
+				note as "備考"
+				is_active as "有効（true/false）"
+				updated_at as "更新日時"
+			)
+		}
+		list Sci_Experiment_Report
+		{
+			displayName = "実験 一覧"
+			show all rows from Sci_Experiment_Form
+			(
+				exp_key as "実験キー"
+				exp_name as "実験名"
+				unit_name as "単元名"
+				note as "備考"
+				is_active as "有効（true/false）"
+				updated_at as "更新日時"
+			)
+		}
+		list Sci_Plan_Report
+		{
+			displayName = "年間指導計画 一覧"
+			show all rows from Sci_Plan_Form
+			(
+				plan_key as "計画キー"
+				school_year as "年度"
+				grade as "学年"
+				plan_month as "月"
+				plan_date as "実施予定日（任意）"
+				unit_name as "単元名"
+				exp_key as "実験キー"
+				exp_name as "実験名"
+				note as "備考"
+				is_active as "有効（true/false）"
+				updated_at as "更新日時"
+			)
+		}
+		list Sci_Chemical_Report
+		{
+			displayName = "薬品 一覧"
+			show all rows from Sci_Chemical_Form
+			(
+				chem_key as "薬品キー"
+				chem_name as "薬品名"
+				unit as "単位"
+				stock_qty as "現在庫"
+				ordered_qty as "発注済み数量"
+				arrival_date as "納品予定日"
+				lead_days as "納品までの日数"
+				supplier as "発注先"
+				hazard as "区分（毒物・劇物等）"
+				order_by as "発注期限（自動計算）"
+				shortage_qty as "不足数量（自動計算）"
+				alert_level as "通知区分（自動計算）"
+				note as "備考"
+				is_active as "有効（true/false）"
+				updated_at as "更新日時"
+			)
+		}
+		list Sci_ExpChem_Report
+		{
+			displayName = "実験ごとの使用薬品 一覧"
+			show all rows from Sci_ExpChem_Form
+			(
+				exp_key as "実験キー"
+				exp_name as "実験名"
+				chem_key as "薬品キー"
+				chem_name as "薬品名"
+				basis as "基準（per_group/per_student/per_class）"
+				amount as "使用量"
+				unit as "単位"
+				is_active as "有効（true/false）"
+				updated_at as "更新日時"
+			)
+		}
+	}
+
+	pages
+	{
+		page Science_Console
+		{
+			displayname="指導計画・薬品管理"
+			Content=""
+		}
+	}
+
+	share_settings
+	{
+		"Developer"
+		{
+			name = "Developer"
+			type = Developer
+			permissions = {Chat:false, Predefined:true, ApiAccess:true, PIIAccess:true, ePHIAccess:true}
+			description = "Developer Profile\n"
+		}
+		"Administrator"
+		{
+			name = "Administrator"
+			type = Users_Permissions
+			permissions = {Chat:true, Predefined:true, ApiAccess:true, PIIAccess:true, ePHIAccess:true}
+			description = "Full access profile\n"
+		}
+		"Customer"
+		{
+			name = "Customer"
+			type = Customer_Portal
+			permissions = {Chat:false, Predefined:true, ApiAccess:true, PIIAccess:true, ePHIAccess:true}
+			description = "Default portal profile\n"
+		}
+		roles
+		{
+			"CEO"
+			{
+				description = "All access"
+			}
+		}
+	}
+
+	web
+	{
+		forms
+		{
+			form Sci_Class_Form
+			{
+				label placement = left
+			}
+			form Sci_Experiment_Form
+			{
+				label placement = left
+			}
+			form Sci_Plan_Form
+			{
+				label placement = left
+			}
+			form Sci_Chemical_Form
+			{
+				label placement = left
+			}
+			form Sci_ExpChem_Form
+			{
+				label placement = left
+			}
+		}
+		reports
+		{
+			report Sci_Class_Report
+			{
+				quickview
+				(
+					layout
+					(
+						type = -1
+						datablock1
+						(
+							layout type = -1
+							fields
+							(
+									school_year as "年度"
+									grade as "学年"
+									class_count as "クラス数"
+									students_per_class as "1クラスの人数"
+									groups_per_class as "1クラスの班数"
+									note as "備考"
+									is_active as "有効（true/false）"
+									updated_at as "更新日時"
+							)
+						)
+					)
+					menu
+					(
+						header
+						(
+							Edit as "編集"
+							Delete as "削除"
+							Print as "印刷"
+							Add
+							Import
+							Export
+						)
+						record
+						(
+							Edit as "編集"
+							Delete as "削除"
+							Print as "印刷"
+						)
+					)
+					action
+					(
+						on click
+						(
+							View Record as "レコード表示"
+						)
+					)
+				)
+				detailview
+				(
+					layout
+					(
+						type = 1
+						datablock1
+						(
+							layout type = -2
+							title = "概要"
+							fields
+							(
+									school_year as "年度"
+									grade as "学年"
+									class_count as "クラス数"
+									students_per_class as "1クラスの人数"
+									groups_per_class as "1クラスの班数"
+									note as "備考"
+									is_active as "有効（true/false）"
+									updated_at as "更新日時"
+							)
+						)
+					)
+					menu
+					(
+						header
+						(
+							Edit as "編集"
+							Delete as "削除"
+							Print as "印刷"
+						)
+					)
+				)
+			}
+			report Sci_Experiment_Report
+			{
+				quickview
+				(
+					layout
+					(
+						type = -1
+						datablock1
+						(
+							layout type = -1
+							fields
+							(
+									exp_key as "実験キー"
+									exp_name as "実験名"
+									unit_name as "単元名"
+									note as "備考"
+									is_active as "有効（true/false）"
+									updated_at as "更新日時"
+							)
+						)
+					)
+					menu
+					(
+						header
+						(
+							Edit as "編集"
+							Delete as "削除"
+							Print as "印刷"
+							Add
+							Import
+							Export
+						)
+						record
+						(
+							Edit as "編集"
+							Delete as "削除"
+							Print as "印刷"
+						)
+					)
+					action
+					(
+						on click
+						(
+							View Record as "レコード表示"
+						)
+					)
+				)
+				detailview
+				(
+					layout
+					(
+						type = 1
+						datablock1
+						(
+							layout type = -2
+							title = "概要"
+							fields
+							(
+									exp_key as "実験キー"
+									exp_name as "実験名"
+									unit_name as "単元名"
+									note as "備考"
+									is_active as "有効（true/false）"
+									updated_at as "更新日時"
+							)
+						)
+					)
+					menu
+					(
+						header
+						(
+							Edit as "編集"
+							Delete as "削除"
+							Print as "印刷"
+						)
+					)
+				)
+			}
+			report Sci_Plan_Report
+			{
+				quickview
+				(
+					layout
+					(
+						type = -1
+						datablock1
+						(
+							layout type = -1
+							fields
+							(
+									plan_key as "計画キー"
+									school_year as "年度"
+									grade as "学年"
+									plan_month as "月"
+									plan_date as "実施予定日（任意）"
+									unit_name as "単元名"
+									exp_key as "実験キー"
+									exp_name as "実験名"
+									note as "備考"
+									is_active as "有効（true/false）"
+									updated_at as "更新日時"
+							)
+						)
+					)
+					menu
+					(
+						header
+						(
+							Edit as "編集"
+							Delete as "削除"
+							Print as "印刷"
+							Add
+							Import
+							Export
+						)
+						record
+						(
+							Edit as "編集"
+							Delete as "削除"
+							Print as "印刷"
+						)
+					)
+					action
+					(
+						on click
+						(
+							View Record as "レコード表示"
+						)
+					)
+				)
+				detailview
+				(
+					layout
+					(
+						type = 1
+						datablock1
+						(
+							layout type = -2
+							title = "概要"
+							fields
+							(
+									plan_key as "計画キー"
+									school_year as "年度"
+									grade as "学年"
+									plan_month as "月"
+									plan_date as "実施予定日（任意）"
+									unit_name as "単元名"
+									exp_key as "実験キー"
+									exp_name as "実験名"
+									note as "備考"
+									is_active as "有効（true/false）"
+									updated_at as "更新日時"
+							)
+						)
+					)
+					menu
+					(
+						header
+						(
+							Edit as "編集"
+							Delete as "削除"
+							Print as "印刷"
+						)
+					)
+				)
+			}
+			report Sci_Chemical_Report
+			{
+				quickview
+				(
+					layout
+					(
+						type = -1
+						datablock1
+						(
+							layout type = -1
+							fields
+							(
+									chem_key as "薬品キー"
+									chem_name as "薬品名"
+									unit as "単位"
+									stock_qty as "現在庫"
+									ordered_qty as "発注済み数量"
+									arrival_date as "納品予定日"
+									lead_days as "納品までの日数"
+									supplier as "発注先"
+									hazard as "区分（毒物・劇物等）"
+									order_by as "発注期限（自動計算）"
+									shortage_qty as "不足数量（自動計算）"
+									alert_level as "通知区分（自動計算）"
+									note as "備考"
+									is_active as "有効（true/false）"
+									updated_at as "更新日時"
+							)
+						)
+					)
+					menu
+					(
+						header
+						(
+							Edit as "編集"
+							Delete as "削除"
+							Print as "印刷"
+							Add
+							Import
+							Export
+						)
+						record
+						(
+							Edit as "編集"
+							Delete as "削除"
+							Print as "印刷"
+						)
+					)
+					action
+					(
+						on click
+						(
+							View Record as "レコード表示"
+						)
+					)
+				)
+				detailview
+				(
+					layout
+					(
+						type = 1
+						datablock1
+						(
+							layout type = -2
+							title = "概要"
+							fields
+							(
+									chem_key as "薬品キー"
+									chem_name as "薬品名"
+									unit as "単位"
+									stock_qty as "現在庫"
+									ordered_qty as "発注済み数量"
+									arrival_date as "納品予定日"
+									lead_days as "納品までの日数"
+									supplier as "発注先"
+									hazard as "区分（毒物・劇物等）"
+									order_by as "発注期限（自動計算）"
+									shortage_qty as "不足数量（自動計算）"
+									alert_level as "通知区分（自動計算）"
+									note as "備考"
+									is_active as "有効（true/false）"
+									updated_at as "更新日時"
+							)
+						)
+					)
+					menu
+					(
+						header
+						(
+							Edit as "編集"
+							Delete as "削除"
+							Print as "印刷"
+						)
+					)
+				)
+			}
+			report Sci_ExpChem_Report
+			{
+				quickview
+				(
+					layout
+					(
+						type = -1
+						datablock1
+						(
+							layout type = -1
+							fields
+							(
+									exp_key as "実験キー"
+									exp_name as "実験名"
+									chem_key as "薬品キー"
+									chem_name as "薬品名"
+									basis as "基準（per_group/per_student/per_class）"
+									amount as "使用量"
+									unit as "単位"
+									is_active as "有効（true/false）"
+									updated_at as "更新日時"
+							)
+						)
+					)
+					menu
+					(
+						header
+						(
+							Edit as "編集"
+							Delete as "削除"
+							Print as "印刷"
+							Add
+							Import
+							Export
+						)
+						record
+						(
+							Edit as "編集"
+							Delete as "削除"
+							Print as "印刷"
+						)
+					)
+					action
+					(
+						on click
+						(
+							View Record as "レコード表示"
+						)
+					)
+				)
+				detailview
+				(
+					layout
+					(
+						type = 1
+						datablock1
+						(
+							layout type = -2
+							title = "概要"
+							fields
+							(
+									exp_key as "実験キー"
+									exp_name as "実験名"
+									chem_key as "薬品キー"
+									chem_name as "薬品名"
+									basis as "基準（per_group/per_student/per_class）"
+									amount as "使用量"
+									unit as "単位"
+									is_active as "有効（true/false）"
+									updated_at as "更新日時"
+							)
+						)
+					)
+					menu
+					(
+						header
+						(
+							Edit as "編集"
+							Delete as "削除"
+							Print as "印刷"
+						)
+					)
+				)
+			}
+		}
+		menu
+		{
+			space Space
+			{
+				displayname = "Space"
+				icon = "objects-spaceship"
+				section Section_App
+				{
+					displayname = "理科 薬品管理"
+					icon = "files-paper"
+					page Science_Console
+					{
+						icon = "tech-desktop"
+					}
+					report Sci_Class_Report
+					{
+						icon = "users-multiple-11"
+					}
+					report Sci_Experiment_Report
+					{
+						icon = "design-todo"
+					}
+					report Sci_Plan_Report
+					{
+						icon = "files-paper"
+					}
+					report Sci_Chemical_Report
+					{
+						icon = "design-todo"
+					}
+					report Sci_ExpChem_Report
+					{
+						icon = "files-archive"
+					}
+					form Sci_Class_Form
+					{
+						icon = "ui-2-settings-90"
+					}
+					form Sci_Experiment_Form
+					{
+						icon = "ui-2-settings-90"
+					}
+					form Sci_Plan_Form
+					{
+						icon = "ui-2-settings-90"
+					}
+					form Sci_Chemical_Form
+					{
+						icon = "ui-2-settings-90"
+					}
+					form Sci_ExpChem_Form
+					{
+						icon = "ui-2-settings-90"
+					}
+				}
+				section ZC_App_Preferences
+				{
+					displayname = "App Preferences"
+					icon = "design-app"
+					systemcomponent
+					{
+						type = localization
+						displayname = "Language Selection"
+						icon = "education-language"
+					}
+				}
+			}
+			preference
+			{
+				icon
+				{
+					style = solid
+					show = {space,section,component}
+				}
+			}
+		}
+		customize
+		{
+			new theme = 4
+			font = "lato"
+			color options
+			{
+				color = "2"
+			}
+			logo
+			{
+				preference = "none"
+				placement = "left"
+			}
+		}
+	}
+	phone
+	{
+		forms
+		{
+			form Sci_Class_Form
+			{
+				label placement = auto
+			}
+			form Sci_Experiment_Form
+			{
+				label placement = auto
+			}
+			form Sci_Plan_Form
+			{
+				label placement = auto
+			}
+			form Sci_Chemical_Form
+			{
+				label placement = auto
+			}
+			form Sci_ExpChem_Form
+			{
+				label placement = auto
+			}
+		}
+		customize
+		{
+			layout = slidingpane
+			font = "default"
+			style = "3"
+			color options
+			{
+				color = blue
+			}
+			logo
+			{
+				preference = "company_logo"
+			}
+		}
+	}
+	tablet
+	{
+		forms
+		{
+			form Sci_Class_Form
+			{
+				label placement = auto
+			}
+			form Sci_Experiment_Form
+			{
+				label placement = auto
+			}
+			form Sci_Plan_Form
+			{
+				label placement = auto
+			}
+			form Sci_Chemical_Form
+			{
+				label placement = auto
+			}
+			form Sci_ExpChem_Form
+			{
+				label placement = auto
+			}
+		}
+		customize
+		{
+			layout = slidingpane
+			font = "default"
+			style = "3"
+			color options
+			{
+				color = blue
+			}
+			logo
+			{
+				preference = "company_logo"
+			}
+		}
+	}
+	translation
+	{
+		{"Language_Settings":{"LANGAGUE_WITH_LOGIN":"browser"}}
+	}
+}
